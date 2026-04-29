@@ -1,7 +1,7 @@
-import { PrismaClient, StockStatus } from "@prisma/client";
+import "dotenv/config";
+import { StockStatus } from "@prisma/client";
 import { mockCards } from "../src/lib/catalog";
-
-const prisma = new PrismaClient();
+import { db } from "../src/lib/db";
 
 function mapStockStatus(status: (typeof mockCards)[number]["stockLabel"]): StockStatus {
   switch (status) {
@@ -16,13 +16,13 @@ function mapStockStatus(status: (typeof mockCards)[number]["stockLabel"]): Stock
 
 async function main() {
   for (const item of mockCards) {
-    const card = await prisma.card.upsert({
+    const card = await db.card.upsert({
       where: { slug: item.slug },
       update: {
         name: item.name,
         setName: item.setName,
         collectorNumber: item.collectorNumber,
-        rarity: item.rarity,
+        rarity: item.rarity ?? null,
         gradient: item.gradient,
         justtcgCardId: item.justtcgCardId ?? null,
         tcgdexCardId: item.tcgdexCardId ?? null,
@@ -32,14 +32,14 @@ async function main() {
         name: item.name,
         setName: item.setName,
         collectorNumber: item.collectorNumber,
-        rarity: item.rarity,
+        rarity: item.rarity ?? null,
         gradient: item.gradient,
         justtcgCardId: item.justtcgCardId ?? null,
         tcgdexCardId: item.tcgdexCardId ?? null,
       },
     });
 
-    await prisma.listing.upsert({
+    await db.listing.upsert({
       where: { cardId: card.id },
       update: {
         shopListed: item.shopListed,
@@ -58,10 +58,10 @@ async function main() {
 
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    await db.$disconnect();
   })
   .catch(async (e) => {
     console.error(e);
-    await prisma.$disconnect();
+    await db.$disconnect();
     process.exit(1);
   });
