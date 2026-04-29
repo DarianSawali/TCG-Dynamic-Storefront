@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum StockStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Card {
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  name            String
+  setName         String
+  collectorNumber String
+  rarity          String?
+  gradient        String
+  justtcgCardId   String?         @unique
+  tcgdexCardId    String?         @unique
+  listing         Listing?
+  priceSnapshots  PriceSnapshot[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Listing {
+  id               String      @id @default(cuid())
+  cardId           String      @unique
+  card             Card        @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  shopListed       Boolean     @default(false)
+  stockStatus      StockStatus @default(IN_STOCK)
+  displayQuantity  Int?
+  allowBackorder   Boolean     @default(false)
+  marketPriceCents Int?
+  shopifyProductId String?
+  shopifyVariantId String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model PriceSnapshot {
+  id         String   @id @default(cuid())
+  cardId     String
+  card       Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  source     String
+  condition  String?
+  currency   String
+  amountCents Int
+  fetchedAt  DateTime @default(now())
+
+  @@index([cardId, fetchedAt(sort: Desc)])
+}
