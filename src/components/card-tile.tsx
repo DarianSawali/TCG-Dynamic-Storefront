@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CatalogCardWithPricing, StockLabel } from "@/lib/catalog";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { formatPrice } from "@/lib/catalog";
 
 function StockBadge({ label }: { label: StockLabel }) {
@@ -67,7 +68,7 @@ function CardMeta({ card }: { card: CatalogCardWithPricing }) {
     card.priceSource === "justtcg" ? " · JustTCG (Near Mint)" : "";
 
   return (
-    <div className="mt-3 space-y-1.5">
+    <div className="mt-3 flex min-h-24 flex-col justify-start space-y-1.5">
       <h2 className="line-clamp-2 text-base font-semibold leading-snug text-zinc-950 dark:text-zinc-50">
         {card.name}
       </h2>
@@ -77,7 +78,7 @@ function CardMeta({ card }: { card: CatalogCardWithPricing }) {
       </p>
       <div className="flex flex-wrap items-center gap-2 pt-0.5">
         <StockBadge label={card.stockLabel} />
-        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+        <span className="line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
           Market{" "}
           <span className="font-medium text-zinc-800 dark:text-zinc-200">
             {formatPrice(card.marketPriceCents)}
@@ -96,7 +97,7 @@ export function CardTile({ card, variant }: CardTileProps) {
     return (
       <Link
         href={href}
-        className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+        className="group flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
       >
         <CardArt card={card} />
         <CardMeta card={card} />
@@ -105,8 +106,8 @@ export function CardTile({ card, variant }: CardTileProps) {
   }
 
   return (
-    <article className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <Link href={href} className="block transition hover:opacity-95">
+    <article className="flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+      <Link href={href} className="block grow transition hover:opacity-95">
         <CardArt card={card} />
         <CardMeta card={card} />
       </Link>
@@ -114,14 +115,10 @@ export function CardTile({ card, variant }: CardTileProps) {
         <span className="text-lg font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">
           {formatPrice(card.marketPriceCents)}
         </span>
-        <button
-          type="button"
-          disabled
-          className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-lg bg-zinc-200 px-3 py-2 text-sm font-medium text-zinc-500 sm:w-auto dark:bg-zinc-800 dark:text-zinc-500"
-          title="Checkout will connect to Shopify later"
-        >
-          Add to cart
-        </button>
+        <AddToCartButton
+          card={card}
+          className="inline-flex w-full items-center justify-center rounded-lg bg-violet-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 sm:w-auto dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
+        />
       </div>
     </article>
   );

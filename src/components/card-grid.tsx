@@ -10,7 +10,7 @@ export function CardGrid({ cards, variant }: CardGridProps) {
   return (
     <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {cards.map((card) => (
-        <li key={card.slug}>
+        <li key={card.slug} className="h-full">
           <CardTile card={card} variant={variant} />
         </li>
       ))}

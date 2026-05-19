@@ -13,7 +13,7 @@ export function SiteFooter() {
             href="/cards"
             className="text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
           >
-            Catalog
+            Explore
           </Link>
           <Link
             href="/shop"

@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { CartProvider } from "@/components/cart/cart-provider";
 
 export default function StoreLayout({
   children,
@@ -7,12 +8,12 @@ export default function StoreLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <CartProvider>
       <SiteHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
         {children}
       </main>
       <SiteFooter />
-    </>
+    </CartProvider>
   );
 }

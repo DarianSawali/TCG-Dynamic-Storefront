@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { getCardBySlug } from "@/data/catalog";
 import { formatPrice } from "@/lib/catalog";
 
@@ -28,7 +29,7 @@ export default async function CardDetailPage({ params }: Props) {
     <div className="space-y-8">
       <nav className="text-sm text-zinc-600 dark:text-zinc-400">
         <Link href="/cards" className="hover:text-zinc-950 dark:hover:text-zinc-50">
-          Cards
+          Explore
         </Link>
         <span className="mx-2 text-zinc-400">/</span>
         <span className="text-zinc-950 dark:text-zinc-50">
@@ -72,6 +73,11 @@ export default async function CardDetailPage({ params }: Props) {
               come from your database and TCGdex when connected.
             </p>
           )}
+          {card?.shopListed ? (
+            <div className="max-w-xs">
+              <AddToCartButton card={card} />
+            </div>
+          ) : null}
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
             <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
               <dt className="text-zinc-500 dark:text-zinc-400">Slug</dt>

@@ -2,7 +2,7 @@ import { CardGrid } from "@/components/card-grid";
 import { getCatalogCards } from "@/data/catalog";
 
 export const metadata = {
-  title: "Cards",
+  title: "Explore",
 };
 
 /** Refresh JustTCG-backed prices periodically (free tier: keep moderate). */
@@ -15,7 +15,7 @@ export default async function CardsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
-          Card catalog
+          Explore the catalog
         </h1>
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">
           Browse mock cards below. Art loads from{" "}

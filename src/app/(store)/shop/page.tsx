@@ -17,8 +17,8 @@ export default async function ShopPage() {
           Shop
         </h1>
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-          Cards marked as listed for sale. Checkout will use Shopify later; add
-          to cart is disabled for now.
+          Cards marked as listed for sale. Add items to your cart and review
+          them before Shopify checkout is connected.
         </p>
       </div>
       {listings.length === 0 ? (

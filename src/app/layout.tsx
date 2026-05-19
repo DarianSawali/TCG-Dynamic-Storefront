@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Cardhouse",
-    template: "%s · Cardhouse",
+    default: "PokeCell",
+    template: "%s · PokeCell",
   },
   description: "Pokémon TCG storefront and catalog",
 };
