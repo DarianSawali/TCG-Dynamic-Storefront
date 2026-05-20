@@ -9,11 +9,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { CardCondition } from "@/lib/conditions";
 
 export type CartItem = {
   slug: string;
   name: string;
   setName: string;
+  condition: CardCondition;
+  conditionLabel: string;
   marketPriceCents: number | null;
   imageUrl: string | null;
   gradient: string;
@@ -27,13 +30,18 @@ type CartContextValue = {
   itemCount: number;
   subtotalCents: number;
   addItem: (item: AddToCartInput) => void;
-  updateQuantity: (slug: string, quantity: number) => void;
-  removeItem: (slug: string) => void;
+  updateQuantity: (lineId: string, quantity: number) => void;
+  removeItem: (lineId: string) => void;
   clearCart: () => void;
+  lineId: (slug: string, condition: CardCondition) => string;
 };
 
 const STORAGE_KEY = "pokecell-cart";
 const CartContext = createContext<CartContextValue | null>(null);
+
+export function cartLineId(slug: string, condition: CardCondition = "NM"): string {
+  return `${slug}:${condition}`;
+}
 
 function parseStoredCart(raw: string | null): CartItem[] {
   if (!raw) return [];
@@ -55,10 +63,19 @@ function parseStoredCart(raw: string | null): CartItem[] {
           return null;
         }
 
+        const condition =
+          typeof entry.condition === "string" ? entry.condition : "NM";
+        const conditionLabel =
+          typeof entry.conditionLabel === "string"
+            ? entry.conditionLabel
+            : condition;
+
         return {
           slug: entry.slug,
           name: entry.name,
           setName: entry.setName,
+          condition: condition as CardCondition,
+          conditionLabel,
           marketPriceCents:
             typeof entry.marketPriceCents === "number"
               ? entry.marketPriceCents
@@ -86,31 +103,44 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = useCallback((item: AddToCartInput) => {
     setItems((current) => {
-      const existingIndex = current.findIndex((entry) => entry.slug === item.slug);
+      const id = cartLineId(item.slug, item.condition);
+      const existingIndex = current.findIndex(
+        (entry) => cartLineId(entry.slug, entry.condition) === id,
+      );
       if (existingIndex === -1) return [...current, { ...item, quantity: 1 }];
 
       return current.map((entry, index) =>
         index === existingIndex
-          ? { ...entry, quantity: entry.quantity + 1, marketPriceCents: item.marketPriceCents }
+          ? {
+              ...entry,
+              quantity: entry.quantity + 1,
+              marketPriceCents: item.marketPriceCents,
+            }
           : entry,
       );
     });
   }, []);
 
-  const updateQuantity = useCallback((slug: string, quantity: number) => {
+  const updateQuantity = useCallback((lineId: string, quantity: number) => {
     setItems((current) => {
       if (quantity <= 0) {
-        return current.filter((item) => item.slug !== slug);
+        return current.filter(
+          (item) => cartLineId(item.slug, item.condition) !== lineId,
+        );
       }
 
       return current.map((item) =>
-        item.slug === slug ? { ...item, quantity: Math.floor(quantity) } : item,
+        cartLineId(item.slug, item.condition) === lineId
+          ? { ...item, quantity: Math.floor(quantity) }
+          : item,
       );
     });
   }, []);
 
-  const removeItem = useCallback((slug: string) => {
-    setItems((current) => current.filter((item) => item.slug !== slug));
+  const removeItem = useCallback((lineId: string) => {
+    setItems((current) =>
+      current.filter((item) => cartLineId(item.slug, item.condition) !== lineId),
+    );
   }, []);
 
   const clearCart = useCallback(() => {
@@ -132,6 +162,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateQuantity,
       removeItem,
       clearCart,
+      lineId: cartLineId,
     };
   }, [addItem, clearCart, items, removeItem, updateQuantity]);
 

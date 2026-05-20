@@ -1,3 +1,13 @@
+import {
+  buildConditionPrices,
+  nmPrice,
+  type CardCondition,
+  type ConditionPrice,
+} from "@/lib/conditions";
+
+export type { CardCondition, ConditionPrice };
+export { buildConditionPrices, nmPrice };
+
 export type StockLabel =
   | "In Stock"
   | "Low Stock"
@@ -13,6 +23,9 @@ export type CatalogCard = {
   rarity?: string;
   /** Tailwind gradient utility classes (e.g. `from-violet-500 to-fuchsia-700`) */
   gradient: string;
+  /** Per-condition shelf prices (NM → DMG) */
+  conditionPrices: ConditionPrice[];
+  /** NM market price (convenience; mirrors conditionPrices.NM) */
   marketPriceCents: number | null;
   stockLabel: StockLabel;
   /** When true, card appears on `/shop` as well as `/cards` */
@@ -57,7 +70,7 @@ export const mockCards: CatalogCard[] = [
     collectorNumber: "027",
     rarity: "Promo",
     gradient: "from-amber-400 to-yellow-600",
-    marketPriceCents: 249,
+    ...withConditionPrices(249),
     stockLabel: "In Stock",
     shopListed: true,
     tcgdexCardId: "svp-027",
@@ -69,7 +82,7 @@ export const mockCards: CatalogCard[] = [
     collectorNumber: "4",
     rarity: "Holo Rare",
     gradient: "from-orange-600 to-red-900",
-    marketPriceCents: 1899,
+    ...withConditionPrices(1899),
     stockLabel: "Low Stock",
     shopListed: true,
     justtcgCardId: "pokemon-base-set-shadowless-charizard-holo-rare",
@@ -82,7 +95,7 @@ export const mockCards: CatalogCard[] = [
     collectorNumber: "193",
     rarity: "Ultra Rare",
     gradient: "from-pink-500 to-violet-700",
-    marketPriceCents: 6299,
+    ...withConditionPrices(6299),
     stockLabel: "Low Stock",
     shopListed: true,
     tcgdexCardId: "sv03.5-193",
@@ -94,7 +107,7 @@ export const mockCards: CatalogCard[] = [
     collectorNumber: "230",
     rarity: "Hyper rare",
     gradient: "from-teal-500 to-cyan-800",
-    marketPriceCents: 175,
+    ...withConditionPrices(175),
     stockLabel: "In Stock",
     shopListed: false,
     tcgdexCardId: "sv03-230",
@@ -106,7 +119,7 @@ export const mockCards: CatalogCard[] = [
     collectorNumber: "082",
     rarity: "Double Rare",
     gradient: "from-slate-500 to-indigo-900",
-    marketPriceCents: null,
+    ...withConditionPrices(null),
     stockLabel: "Out of Stock",
     shopListed: false,
     tcgdexCardId: "sv07-082",
@@ -118,9 +131,17 @@ export const mockCards: CatalogCard[] = [
     collectorNumber: "217",
     rarity: "Shiny Ultra Rare",
     gradient: "from-emerald-500 to-teal-800",
-    marketPriceCents: 425,
+    ...withConditionPrices(425),
     stockLabel: "In Stock",
     shopListed: true,
     tcgdexCardId: "sv04.5-217",
   },
 ];
+
+function withConditionPrices(nmCents: number | null): {
+  conditionPrices: ConditionPrice[];
+  marketPriceCents: number | null;
+} {
+  const conditionPrices = buildConditionPrices(nmCents);
+  return { conditionPrices, marketPriceCents: nmPrice(conditionPrices) };
+}

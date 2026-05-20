@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { ConditionBuyPanel } from "@/components/condition-buy-panel";
+import { ConditionPriceTable } from "@/components/condition-price-table";
 import { getCardBySlug } from "@/data/catalog";
 import { formatPrice } from "@/lib/catalog";
 
@@ -73,11 +74,20 @@ export default async function CardDetailPage({ params }: Props) {
               come from your database and TCGdex when connected.
             </p>
           )}
-          {card?.shopListed ? (
-            <div className="max-w-xs">
-              <AddToCartButton card={card} />
-            </div>
+          {card?.shopListed ? <ConditionBuyPanel card={card} /> : null}
+
+          {card ? (
+            <section className="space-y-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                Prices by condition
+              </h2>
+              <ConditionPriceTable
+                prices={card.conditionPrices}
+                priceSource={card.priceSource}
+              />
+            </section>
           ) : null}
+
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
             <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
               <dt className="text-zinc-500 dark:text-zinc-400">Slug</dt>
@@ -86,12 +96,12 @@ export default async function CardDetailPage({ params }: Props) {
               </dd>
             </div>
             <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
-              <dt className="text-zinc-500 dark:text-zinc-400">Market</dt>
+              <dt className="text-zinc-500 dark:text-zinc-400">Market (NM)</dt>
               <dd className="text-zinc-950 dark:text-zinc-50">
                 {card ? formatPrice(card.marketPriceCents) : "—"}
                 {card?.priceSource === "justtcg" ? (
                   <span className="mt-1 block text-xs font-normal text-zinc-500 dark:text-zinc-400">
-                    JustTCG · Near Mint
+                    JustTCG · NM baseline
                   </span>
                 ) : null}
               </dd>

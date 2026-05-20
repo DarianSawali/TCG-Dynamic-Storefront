@@ -1,5 +1,6 @@
 import "dotenv/config";
-import { StockStatus } from "@prisma/client";
+import { CardCondition, StockStatus } from "@prisma/client";
+import { buildConditionPrices } from "../src/lib/conditions";
 import { mockCards } from "../src/lib/catalog";
 import { db } from "../src/lib/db";
 
@@ -39,7 +40,7 @@ async function main() {
       },
     });
 
-    await db.listing.upsert({
+    const listing = await db.listing.upsert({
       where: { cardId: card.id },
       update: {
         shopListed: item.shopListed,
@@ -53,6 +54,28 @@ async function main() {
         marketPriceCents: item.marketPriceCents,
       },
     });
+
+    const conditionRows = buildConditionPrices(item.marketPriceCents);
+    for (const row of conditionRows) {
+      await db.listingCondition.upsert({
+        where: {
+          listingId_condition: {
+            listingId: listing.id,
+            condition: row.condition as CardCondition,
+          },
+        },
+        update: { priceCents: row.priceCents },
+        create: {
+          listingId: listing.id,
+          condition: row.condition as CardCondition,
+          priceCents: row.priceCents,
+          stockStatus:
+            row.condition === "NM"
+              ? mapStockStatus(item.stockLabel)
+              : StockStatus.IN_STOCK,
+        },
+      });
+    }
   }
 }
 

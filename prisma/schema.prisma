@@ -17,6 +17,14 @@ enum StockStatus {
   OUT_OF_STOCK
 }
 
+enum CardCondition {
+  NM
+  LP
+  MP
+  HP
+  DMG
+}
+
 model Admin {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -42,18 +50,33 @@ model Card {
 }
 
 model Listing {
-  id               String      @id @default(cuid())
-  cardId           String      @unique
-  card             Card        @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  shopListed       Boolean     @default(false)
-  stockStatus      StockStatus @default(IN_STOCK)
+  id               String              @id @default(cuid())
+  cardId           String              @unique
+  card             Card                @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  shopListed       Boolean             @default(false)
+  stockStatus      StockStatus         @default(IN_STOCK)
   displayQuantity  Int?
-  allowBackorder   Boolean     @default(false)
+  allowBackorder   Boolean             @default(false)
+  /** NM reference price; kept in sync with the NM condition row when seeded */
   marketPriceCents Int?
+  conditionPrices  ListingCondition[]
   shopifyProductId String?
   shopifyVariantId String?
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+}
+
+model ListingCondition {
+  id            String        @id @default(cuid())
+  listingId     String
+  listing       Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  condition     CardCondition
+  priceCents    Int?
+  stockStatus   StockStatus   @default(IN_STOCK)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([listingId, condition])
 }
 
 model PriceSnapshot {
@@ -61,7 +84,7 @@ model PriceSnapshot {
   cardId     String
   card       Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
   source     String
-  condition  String?
+  condition  CardCondition?
   currency   String
   amountCents Int
   fetchedAt  DateTime @default(now())

@@ -65,7 +65,7 @@ function CardArt({ card }: { card: CatalogCardWithPricing }) {
 
 function CardMeta({ card }: { card: CatalogCardWithPricing }) {
   const sourceLabel =
-    card.priceSource === "justtcg" ? " · JustTCG (Near Mint)" : "";
+    card.priceSource === "justtcg" ? " · JustTCG (NM)" : "";
 
   return (
     <div className="mt-3 flex min-h-24 flex-col justify-start space-y-1.5">
@@ -79,10 +79,11 @@ function CardMeta({ card }: { card: CatalogCardWithPricing }) {
       <div className="flex flex-wrap items-center gap-2 pt-0.5">
         <StockBadge label={card.stockLabel} />
         <span className="line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
-          Market{" "}
+          NM{" "}
           <span className="font-medium text-zinc-800 dark:text-zinc-200">
             {formatPrice(card.marketPriceCents)}
           </span>
+          <span className="text-zinc-400 dark:text-zinc-500"> · 5 conditions</span>
           {sourceLabel}
         </span>
       </div>

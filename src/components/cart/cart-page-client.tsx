@@ -36,7 +36,8 @@ function QuantityControl({
 }
 
 export function CartPageClient() {
-  const { items, subtotalCents, updateQuantity, removeItem, clearCart } = useCart();
+  const { items, subtotalCents, updateQuantity, removeItem, clearCart, lineId } =
+    useCart();
 
   if (items.length === 0) {
     return (
@@ -78,9 +79,11 @@ export function CartPageClient() {
       </div>
 
       <ul className="space-y-3">
-        {items.map((item) => (
+        {items.map((item) => {
+          const id = lineId(item.slug, item.condition);
+          return (
           <li
-            key={item.slug}
+            key={id}
             className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center dark:border-zinc-800 dark:bg-zinc-950"
           >
             <Link href={`/cards/${item.slug}`} className="flex items-center gap-3">
@@ -100,6 +103,12 @@ export function CartPageClient() {
               <div>
                 <p className="font-medium text-zinc-950 dark:text-zinc-50">{item.name}</p>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">{item.setName}</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {item.conditionLabel}{" "}
+                  <span className="font-mono text-zinc-600 dark:text-zinc-300">
+                    ({item.condition})
+                  </span>
+                </p>
                 <p className="text-sm font-medium text-zinc-900 dark:text-zinc-200">
                   {formatPrice(item.marketPriceCents)}
                 </p>
@@ -109,21 +118,22 @@ export function CartPageClient() {
             <div className="flex flex-1 flex-wrap items-center justify-end gap-3">
               <QuantityControl
                 value={item.quantity}
-                onChange={(next) => updateQuantity(item.slug, next)}
+                onChange={(next) => updateQuantity(id, next)}
               />
               <p className="w-24 text-right font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">
                 {formatPrice((item.marketPriceCents ?? 0) * item.quantity)}
               </p>
               <button
                 type="button"
-                onClick={() => removeItem(item.slug)}
+                onClick={() => removeItem(id)}
                 className="text-sm font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300"
               >
                 Remove
               </button>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50">

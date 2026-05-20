@@ -2,7 +2,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+### Database (PostgreSQL)
+
+See **[docs/postgres-setup.md](docs/postgres-setup.md)** for step-by-step setup after a fresh install or machine reset.
+
+### Dev server
 
 ```bash
 npm run dev
