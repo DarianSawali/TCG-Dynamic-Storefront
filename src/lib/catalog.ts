@@ -4,6 +4,11 @@ import {
   type CardCondition,
   type ConditionPrice,
 } from "@/lib/conditions";
+import {
+  setDisplayName,
+  type CardLocale,
+  type StoreSet,
+} from "@/lib/sets";
 
 export type { CardCondition, ConditionPrice };
 export { buildConditionPrices, nmPrice };
@@ -18,6 +23,8 @@ export type PriceSource = "justtcg" | "mock";
 export type CatalogCard = {
   slug: string;
   name: string;
+  setCode: string;
+  locale: CardLocale;
   setName: string;
   collectorNumber: string;
   rarity?: string;
@@ -36,8 +43,7 @@ export type CatalogCard = {
    */
   justtcgCardId?: string;
   /**
-   * TCGdex `id` for artwork (`GET https://api.tcgdex.net/v2/en/cards/{id}`).
-   * Example: `svp-027`, `base1-4`, `sv03.5-193`.
+   * TCGdex `id` for artwork (`GET https://api.tcgdex.net/v2/{locale}/cards/{id}`).
    */
   tcgdexCardId?: string;
 };
@@ -61,87 +67,246 @@ export function formatPrice(
   }).format(cents / 100);
 }
 
-/** Mock catalog; replace with DB queries later */
+type MockCardInput = Omit<CatalogCard, "conditionPrices" | "marketPriceCents" | "setName"> & {
+  nmCents: number | null;
+  storeSet: StoreSet;
+};
+
+function mockCard(input: MockCardInput): CatalogCard {
+  const { nmCents, storeSet, ...card } = input;
+  const conditionPrices = buildConditionPrices(nmCents);
+  return {
+    ...card,
+    setName: setDisplayName(storeSet.code, storeSet.locale),
+    conditionPrices,
+    marketPriceCents: nmPrice(conditionPrices),
+  };
+}
+
+/** In-scope catalog: 151, Phantasmal Flames, and Ascended Heroes (EN + JP). */
 export const mockCards: CatalogCard[] = [
-  {
-    slug: "pikachu-svp-027",
-    name: "Pikachu",
-    setName: "SV Black Star Promos",
-    collectorNumber: "027",
-    rarity: "Promo",
-    gradient: "from-amber-400 to-yellow-600",
-    ...withConditionPrices(249),
-    stockLabel: "In Stock",
-    shopListed: true,
-    tcgdexCardId: "svp-027",
-  },
-  {
-    slug: "charizard-base-set-shadowless",
-    name: "Charizard",
-    setName: "Base Set",
-    collectorNumber: "4",
-    rarity: "Holo Rare",
-    gradient: "from-orange-600 to-red-900",
-    ...withConditionPrices(1899),
-    stockLabel: "Low Stock",
-    shopListed: true,
-    justtcgCardId: "pokemon-base-set-shadowless-charizard-holo-rare",
-    tcgdexCardId: "base1-4",
-  },
-  {
-    slug: "mew-ex-151",
+  mockCard({
+    slug: "mew-ex-151-en",
     name: "Mew ex",
-    setName: "151",
+    setCode: "sv03.5",
+    locale: "en",
+    storeSet: { code: "sv03.5", locale: "en", name: "151", series: "151" },
     collectorNumber: "193",
     rarity: "Ultra Rare",
     gradient: "from-pink-500 to-violet-700",
-    ...withConditionPrices(6299),
+    nmCents: 6299,
     stockLabel: "Low Stock",
     shopListed: true,
     tcgdexCardId: "sv03.5-193",
-  },
-  {
-    slug: "basic-fire-energy-sv03",
-    name: "Basic Fire Energy",
-    setName: "Obsidian Flames",
-    collectorNumber: "230",
-    rarity: "Hyper rare",
-    gradient: "from-teal-500 to-cyan-800",
-    ...withConditionPrices(175),
-    stockLabel: "In Stock",
-    shopListed: false,
-    tcgdexCardId: "sv03-230",
-  },
-  {
-    slug: "lucario-ex-stellar-082",
-    name: "Lucario ex",
-    setName: "Stellar Crown",
-    collectorNumber: "082",
+  }),
+  mockCard({
+    slug: "charizard-ex-151-en",
+    name: "Charizard ex",
+    setCode: "sv03.5",
+    locale: "en",
+    storeSet: { code: "sv03.5", locale: "en", name: "151", series: "151" },
+    collectorNumber: "006",
     rarity: "Double Rare",
-    gradient: "from-slate-500 to-indigo-900",
-    ...withConditionPrices(null),
-    stockLabel: "Out of Stock",
-    shopListed: false,
-    tcgdexCardId: "sv07-082",
-  },
-  {
-    slug: "gardevoir-ex-paldean-fates",
-    name: "Gardevoir ex",
-    setName: "Paldean Fates",
-    collectorNumber: "217",
-    rarity: "Shiny Ultra Rare",
-    gradient: "from-emerald-500 to-teal-800",
-    ...withConditionPrices(425),
+    gradient: "from-orange-600 to-red-900",
+    nmCents: 4499,
     stockLabel: "In Stock",
     shopListed: true,
-    tcgdexCardId: "sv04.5-217",
-  },
+    tcgdexCardId: "sv03.5-006",
+  }),
+  mockCard({
+    slug: "mew-ex-151-ja",
+    name: "ミュウex",
+    setCode: "SV2a",
+    locale: "ja",
+    storeSet: {
+      code: "SV2a",
+      locale: "ja",
+      name: "151",
+      nameJa: "ポケモンカード151",
+      series: "151",
+    },
+    collectorNumber: "151",
+    rarity: "Ultra Rare",
+    gradient: "from-pink-500 to-violet-700",
+    nmCents: 5899,
+    stockLabel: "In Stock",
+    shopListed: true,
+    tcgdexCardId: "SV2a-151",
+  }),
+  mockCard({
+    slug: "charizard-ex-151-ja",
+    name: "リザードンex",
+    setCode: "SV2a",
+    locale: "ja",
+    storeSet: {
+      code: "SV2a",
+      locale: "ja",
+      name: "151",
+      nameJa: "ポケモンカード151",
+      series: "151",
+    },
+    collectorNumber: "006",
+    rarity: "Double Rare",
+    gradient: "from-orange-600 to-red-900",
+    nmCents: 4199,
+    stockLabel: "Low Stock",
+    shopListed: false,
+    tcgdexCardId: "SV2a-006",
+  }),
+  mockCard({
+    slug: "mega-charizard-x-phantasmal-en",
+    name: "Mega Charizard X ex",
+    setCode: "me02",
+    locale: "en",
+    storeSet: {
+      code: "me02",
+      locale: "en",
+      name: "Phantasmal Flames",
+      series: "phantasmal-flames",
+    },
+    collectorNumber: "013",
+    rarity: "Double Rare",
+    gradient: "from-orange-700 to-red-950",
+    nmCents: 8999,
+    stockLabel: "Low Stock",
+    shopListed: true,
+    tcgdexCardId: "me02-013",
+  }),
+  mockCard({
+    slug: "mega-gengar-phantasmal-en",
+    name: "Mega Gengar ex",
+    setCode: "me02",
+    locale: "en",
+    storeSet: {
+      code: "me02",
+      locale: "en",
+      name: "Phantasmal Flames",
+      series: "phantasmal-flames",
+    },
+    collectorNumber: "056",
+    rarity: "Double Rare",
+    gradient: "from-violet-800 to-indigo-950",
+    nmCents: 5499,
+    stockLabel: "In Stock",
+    shopListed: true,
+    tcgdexCardId: "me02-056",
+  }),
+  mockCard({
+    slug: "mega-charizard-x-inferno-ja",
+    name: "メガリザードンXex",
+    setCode: "M2",
+    locale: "ja",
+    storeSet: {
+      code: "M2",
+      locale: "ja",
+      name: "Phantasmal Flames",
+      nameJa: "インフェルノX",
+      series: "phantasmal-flames",
+    },
+    collectorNumber: "013",
+    rarity: "Double Rare",
+    gradient: "from-orange-700 to-red-950",
+    nmCents: 8499,
+    stockLabel: "In Stock",
+    shopListed: true,
+    tcgdexCardId: "M2-013",
+  }),
+  mockCard({
+    slug: "mega-heracross-inferno-ja",
+    name: "メガヘラクロスex",
+    setCode: "M2",
+    locale: "ja",
+    storeSet: {
+      code: "M2",
+      locale: "ja",
+      name: "Phantasmal Flames",
+      nameJa: "インフェルノX",
+      series: "phantasmal-flames",
+    },
+    collectorNumber: "004",
+    rarity: "Double Rare",
+    gradient: "from-lime-600 to-emerald-900",
+    nmCents: 2199,
+    stockLabel: "In Stock",
+    shopListed: false,
+    tcgdexCardId: "M2-004",
+  }),
+  mockCard({
+    slug: "mega-gengar-ascended-en",
+    name: "Mega Gengar ex",
+    setCode: "me02.5",
+    locale: "en",
+    storeSet: {
+      code: "me02.5",
+      locale: "en",
+      name: "Ascended Heroes",
+      series: "ascended-heroes",
+    },
+    collectorNumber: "125",
+    rarity: "Ultra Rare",
+    gradient: "from-purple-700 to-fuchsia-950",
+    nmCents: 12999,
+    stockLabel: "Low Stock",
+    shopListed: true,
+    tcgdexCardId: "me02.5-125",
+  }),
+  mockCard({
+    slug: "mega-gardevoir-ascended-en",
+    name: "Mega Gardevoir ex",
+    setCode: "me02.5",
+    locale: "en",
+    storeSet: {
+      code: "me02.5",
+      locale: "en",
+      name: "Ascended Heroes",
+      series: "ascended-heroes",
+    },
+    collectorNumber: "089",
+    rarity: "Double Rare",
+    gradient: "from-emerald-500 to-teal-800",
+    nmCents: 3799,
+    stockLabel: "In Stock",
+    shopListed: true,
+    tcgdexCardId: "me02.5-089",
+  }),
+  mockCard({
+    slug: "gengar-munikis-ja",
+    name: "ゲンガー",
+    setCode: "M3",
+    locale: "ja",
+    storeSet: {
+      code: "M3",
+      locale: "ja",
+      name: "Ascended Heroes",
+      nameJa: "ムニキスゼロ",
+      series: "ascended-heroes",
+    },
+    collectorNumber: "049",
+    rarity: "Rare",
+    gradient: "from-violet-700 to-purple-950",
+    nmCents: 1299,
+    stockLabel: "In Stock",
+    shopListed: false,
+    tcgdexCardId: "M3-049",
+  }),
+  mockCard({
+    slug: "mega-starmie-munikis-ja",
+    name: "メガスターミーex",
+    setCode: "M3",
+    locale: "ja",
+    storeSet: {
+      code: "M3",
+      locale: "ja",
+      name: "Ascended Heroes",
+      nameJa: "ムニキスゼロ",
+      series: "ascended-heroes",
+    },
+    collectorNumber: "021",
+    rarity: "Double Rare",
+    gradient: "from-cyan-500 to-blue-900",
+    nmCents: 2899,
+    stockLabel: "In Stock",
+    shopListed: true,
+    tcgdexCardId: "M3-021",
+  }),
 ];
-
-function withConditionPrices(nmCents: number | null): {
-  conditionPrices: ConditionPrice[];
-  marketPriceCents: number | null;
-} {
-  const conditionPrices = buildConditionPrices(nmCents);
-  return { conditionPrices, marketPriceCents: nmPrice(conditionPrices) };
-}

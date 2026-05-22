@@ -9,59 +9,92 @@ import {
 import { mockCards, type CatalogCardWithPricing, type StockLabel } from "@/lib/catalog";
 import { db } from "@/lib/db";
 import { mergeJustTcgPrices } from "@/lib/justtcg/merge-catalog-prices";
+import {
+  filterVisibleCards,
+  getVisibleStoreSetCodes,
+  isLocaleVisible,
+} from "@/lib/sets";
 import { enrichTcgdexImages } from "@/lib/tcgdex/enrich-images";
 
 export type { CatalogCardWithPricing };
 
+export type CatalogFilters = {
+  setCode?: string;
+  locale?: "en" | "ja";
+};
+
+function applyFilters(
+  cards: CatalogCardWithPricing[],
+  filters?: CatalogFilters,
+): CatalogCardWithPricing[] {
+  let result = filterVisibleCards(cards);
+  if (!filters?.setCode && !filters?.locale) return result;
+  return result.filter((card) => {
+    if (filters.setCode && card.setCode !== filters.setCode) return false;
+    if (filters.locale && card.locale !== filters.locale) return false;
+    return true;
+  });
+}
+
 /** One pass of JustTCG + TCGdex per request (deduped across RSC reads). */
-export const getCatalogCards = cache(async (): Promise<CatalogCardWithPricing[]> => {
-  let source = mockCards;
-  try {
-    const dbRows = await db.card.findMany({
-      include: {
-        listing: {
-          include: { conditionPrices: { orderBy: { condition: "asc" } } },
+export const getCatalogCards = cache(
+  async (filters?: CatalogFilters): Promise<CatalogCardWithPricing[]> => {
+    let source = filterVisibleCards(mockCards);
+    try {
+      const visibleCodes = getVisibleStoreSetCodes();
+      const dbRows = await db.card.findMany({
+        where: {
+          setCode: { in: visibleCodes },
+          ...(isLocaleVisible("ja") ? {} : { locale: "en" }),
         },
-      },
-      orderBy: { createdAt: "asc" },
-    });
-    if (dbRows.length > 0) {
-      source = dbRows.map((row) => {
-        const nmCents = row.listing?.marketPriceCents ?? null;
-        const overrides = row.listing?.conditionPrices.length
-          ? Object.fromEntries(
-              row.listing.conditionPrices.map((cp) => [
-                cp.condition as CardCondition,
-                cp.priceCents,
-              ]),
-            )
-          : undefined;
-
-        const conditionPrices = buildConditionPrices(nmCents, overrides);
-
-        return {
-          slug: row.slug,
-          name: row.name,
-          setName: row.setName,
-          collectorNumber: row.collectorNumber,
-          rarity: row.rarity ?? undefined,
-          gradient: row.gradient,
-          conditionPrices,
-          marketPriceCents: nmPrice(conditionPrices),
-          stockLabel: toStockLabel(row.listing?.stockStatus),
-          shopListed: row.listing?.shopListed ?? false,
-          justtcgCardId: row.justtcgCardId ?? undefined,
-          tcgdexCardId: row.tcgdexCardId ?? undefined,
-        };
+        include: {
+          listing: {
+            include: { conditionPrices: { orderBy: { condition: "asc" } } },
+          },
+        },
+        orderBy: [{ setCode: "asc" }, { locale: "asc" }, { createdAt: "asc" }],
       });
-    }
-  } catch {
-    // Fallback to static mock rows until Prisma migration/seed is ready.
-  }
+      if (dbRows.length > 0) {
+        source = dbRows.map((row) => {
+          const nmCents = row.listing?.marketPriceCents ?? null;
+          const overrides = row.listing?.conditionPrices.length
+            ? Object.fromEntries(
+                row.listing.conditionPrices.map((cp) => [
+                  cp.condition as CardCondition,
+                  cp.priceCents,
+                ]),
+              )
+            : undefined;
 
-  const priced = await mergeJustTcgPrices(source);
-  return enrichTcgdexImages(priced);
-});
+          const conditionPrices = buildConditionPrices(nmCents, overrides);
+
+          return {
+            slug: row.slug,
+            name: row.name,
+            setCode: row.setCode,
+            locale: row.locale,
+            setName: row.setName,
+            collectorNumber: row.collectorNumber,
+            rarity: row.rarity ?? undefined,
+            gradient: row.gradient,
+            conditionPrices,
+            marketPriceCents: nmPrice(conditionPrices),
+            stockLabel: toStockLabel(row.listing?.stockStatus),
+            shopListed: row.listing?.shopListed ?? false,
+            justtcgCardId: row.justtcgCardId ?? undefined,
+            tcgdexCardId: row.tcgdexCardId ?? undefined,
+          };
+        });
+      }
+    } catch {
+      // Fallback to static mock rows until Prisma migration/seed is ready.
+    }
+
+    const priced = await mergeJustTcgPrices(source);
+    const withImages = await enrichTcgdexImages(priced);
+    return applyFilters(withImages, filters);
+  },
+);
 
 function toStockLabel(stockStatus: StockStatus | undefined): StockLabel {
   switch (stockStatus) {
@@ -75,8 +108,10 @@ function toStockLabel(stockStatus: StockStatus | undefined): StockLabel {
   }
 }
 
-export async function getShopCards(): Promise<CatalogCardWithPricing[]> {
-  const all = await getCatalogCards();
+export async function getShopCards(
+  filters?: CatalogFilters,
+): Promise<CatalogCardWithPricing[]> {
+  const all = await getCatalogCards(filters);
   return all.filter((c) => c.shopListed);
 }
 

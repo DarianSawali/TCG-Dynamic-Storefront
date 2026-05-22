@@ -1,8 +1,7 @@
 import "server-only";
 
 import type { CatalogCardWithPricing } from "@/lib/catalog";
-
-const TCGDEX_CARD_URL = "https://api.tcgdex.net/v2/en/cards";
+import type { CardLocale } from "@/lib/sets";
 
 /** TCGdex returns a base path; append quality + extension per https://tcgdex.dev/assets */
 export function tcgdexDisplayImageUrl(imageBase: string): string {
@@ -16,8 +15,9 @@ type TcgdexCardJson = {
 
 async function fetchTcgdexImageForId(
   tcgdexCardId: string,
+  locale: CardLocale,
 ): Promise<string | null> {
-  const url = `${TCGDEX_CARD_URL}/${encodeURIComponent(tcgdexCardId)}`;
+  const url = `https://api.tcgdex.net/v2/${locale}/cards/${encodeURIComponent(tcgdexCardId)}`;
   const res = await fetch(url, {
     headers: { Accept: "application/json" },
     next: { revalidate: 86_400 },
@@ -40,17 +40,18 @@ export async function enrichTcgdexImages(
   const pending = new Map<string, Promise<string | null>>();
   const resolved = new Map<string, string | null>();
 
-  const getImage = (id: string): Promise<string | null> => {
-    const hit = resolved.get(id);
+  const getImage = (id: string, locale: CardLocale): Promise<string | null> => {
+    const key = `${locale}:${id}`;
+    const hit = resolved.get(key);
     if (hit !== undefined) return Promise.resolve(hit);
-    let p = pending.get(id);
+    let p = pending.get(key);
     if (!p) {
-      p = fetchTcgdexImageForId(id).then((url) => {
-        resolved.set(id, url);
-        pending.delete(id);
+      p = fetchTcgdexImageForId(id, locale).then((url) => {
+        resolved.set(key, url);
+        pending.delete(key);
         return url;
       });
-      pending.set(id, p);
+      pending.set(key, p);
     }
     return p;
   };
@@ -60,7 +61,7 @@ export async function enrichTcgdexImages(
       if (!card.tcgdexCardId) {
         return { ...card, imageUrl: null };
       }
-      const imageUrl = await getImage(card.tcgdexCardId);
+      const imageUrl = await getImage(card.tcgdexCardId, card.locale);
       return { ...card, imageUrl };
     }),
   );

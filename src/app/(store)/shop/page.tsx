@@ -16,9 +16,10 @@ export default async function ShopPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
           Shop
         </h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-          Cards marked as listed for sale. Add items to your cart and review
-          them before Shopify checkout is connected.
+        <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">
+          Shop listings from our in-scope sets only: 151, Phantasmal Flames, and
+          Ascended Heroes (English). Add items to your cart before
+          Shopify checkout is connected.
         </p>
       </div>
       {listings.length === 0 ? (

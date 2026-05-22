@@ -25,6 +25,11 @@ enum CardCondition {
   DMG
 }
 
+enum CardLocale {
+  en
+  ja
+}
+
 model Admin {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -37,6 +42,9 @@ model Card {
   id              String          @id @default(cuid())
   slug            String          @unique
   name            String
+  /** TCGdex set id — must be one of the six in-scope expansions */
+  setCode         String
+  locale          CardLocale
   setName         String
   collectorNumber String
   rarity          String?

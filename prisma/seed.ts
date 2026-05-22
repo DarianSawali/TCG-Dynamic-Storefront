@@ -3,6 +3,7 @@ import { CardCondition, StockStatus } from "@prisma/client";
 import { buildConditionPrices } from "../src/lib/conditions";
 import { mockCards } from "../src/lib/catalog";
 import { db } from "../src/lib/db";
+import { STORE_SET_CODES } from "../src/lib/sets";
 
 function mapStockStatus(status: (typeof mockCards)[number]["stockLabel"]): StockStatus {
   switch (status) {
@@ -16,11 +17,24 @@ function mapStockStatus(status: (typeof mockCards)[number]["stockLabel"]): Stock
 }
 
 async function main() {
+  const slugs = mockCards.map((c) => c.slug);
+
+  await db.card.deleteMany({
+    where: {
+      OR: [
+        { slug: { notIn: slugs } },
+        { setCode: { notIn: [...STORE_SET_CODES] } },
+      ],
+    },
+  });
+
   for (const item of mockCards) {
     const card = await db.card.upsert({
       where: { slug: item.slug },
       update: {
         name: item.name,
+        setCode: item.setCode,
+        locale: item.locale,
         setName: item.setName,
         collectorNumber: item.collectorNumber,
         rarity: item.rarity ?? null,
@@ -31,6 +45,8 @@ async function main() {
       create: {
         slug: item.slug,
         name: item.name,
+        setCode: item.setCode,
+        locale: item.locale,
         setName: item.setName,
         collectorNumber: item.collectorNumber,
         rarity: item.rarity ?? null,

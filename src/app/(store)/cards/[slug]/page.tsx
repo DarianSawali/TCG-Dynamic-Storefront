@@ -5,6 +5,7 @@ import { ConditionBuyPanel } from "@/components/condition-buy-panel";
 import { ConditionPriceTable } from "@/components/condition-price-table";
 import { getCardBySlug } from "@/data/catalog";
 import { formatPrice } from "@/lib/catalog";
+import { localeBadge, showLocaleBadge } from "@/lib/sets";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -65,6 +66,11 @@ export default async function CardDetailPage({ params }: Props) {
           </h1>
           {card ? (
             <p className="text-zinc-600 dark:text-zinc-400">
+              {showLocaleBadge(card.locale) ? (
+                <span className="mr-2 inline-flex rounded bg-zinc-100 px-2 py-0.5 font-mono text-xs font-bold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                  {localeBadge(card.locale)}
+                </span>
+              ) : null}
               {card.setName} · {card.collectorNumber}
               {card.rarity ? ` · ${card.rarity}` : ""}
             </p>

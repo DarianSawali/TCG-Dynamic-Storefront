@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { CatalogCardWithPricing, StockLabel } from "@/lib/catalog";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { formatPrice } from "@/lib/catalog";
+import { localeBadge, showLocaleBadge } from "@/lib/sets";
 
 function StockBadge({ label }: { label: StockLabel }) {
   const styles: Record<StockLabel, string> = {
@@ -73,6 +74,11 @@ function CardMeta({ card }: { card: CatalogCardWithPricing }) {
         {card.name}
       </h2>
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        {showLocaleBadge(card.locale) ? (
+          <span className="mr-1.5 inline-flex rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+            {localeBadge(card.locale)}
+          </span>
+        ) : null}
         {card.setName} · {card.collectorNumber}
         {card.rarity ? ` · ${card.rarity}` : ""}
       </p>
