@@ -58,6 +58,9 @@ export async function enrichTcgdexImages(
 
   return Promise.all(
     cards.map(async (card) => {
+      if (card.tcgdexImageUrl) {
+        return { ...card, imageUrl: tcgdexDisplayImageUrl(card.tcgdexImageUrl) };
+      }
       if (!card.tcgdexCardId) {
         return { ...card, imageUrl: null };
       }

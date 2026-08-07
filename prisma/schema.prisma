@@ -51,6 +51,8 @@ model Card {
   gradient        String
   justtcgCardId   String?         @unique
   tcgdexCardId    String?         @unique
+  /** Base TCGdex image URL (no quality/extension suffix), saved at fetch time so we don't re-hit TCGdex per card per request. */
+  tcgdexImageUrl  String?
   listing         Listing?
   priceSnapshots  PriceSnapshot[]
   createdAt       DateTime        @default(now())

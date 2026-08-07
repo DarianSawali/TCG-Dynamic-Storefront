@@ -46,6 +46,8 @@ export type CatalogCard = {
    * TCGdex `id` for artwork (`GET https://api.tcgdex.net/v2/{locale}/cards/{id}`).
    */
   tcgdexCardId?: string;
+  /** Base TCGdex image URL saved at fetch time; skips a live TCGdex call when present. */
+  tcgdexImageUrl?: string | null;
 };
 
 /** After `getCatalogCards()` merges JustTCG prices and TCGdex image URLs. */

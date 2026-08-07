@@ -83,6 +83,7 @@ export const getCatalogCards = cache(
             shopListed: row.listing?.shopListed ?? false,
             justtcgCardId: row.justtcgCardId ?? undefined,
             tcgdexCardId: row.tcgdexCardId ?? undefined,
+            tcgdexImageUrl: row.tcgdexImageUrl,
           };
         });
       }
