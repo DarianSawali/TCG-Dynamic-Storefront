@@ -11,6 +11,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:fetch-sets": "tsx scripts/fetch-tcgdex-sets.ts",
+    "admin:create": "tsx scripts/create-admin.ts",
     "db:setup": "prisma migrate deploy && prisma db seed",
     "postinstall": "prisma generate"
   },

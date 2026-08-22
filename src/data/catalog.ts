@@ -4,7 +4,6 @@ import {
   buildConditionPrices,
   nmPrice,
   type CardCondition,
-  type ConditionPrice,
 } from "@/lib/conditions";
 import { mockCards, type CatalogCardWithPricing, type StockLabel } from "@/lib/catalog";
 import { db } from "@/lib/db";
@@ -27,7 +26,7 @@ function applyFilters(
   cards: CatalogCardWithPricing[],
   filters?: CatalogFilters,
 ): CatalogCardWithPricing[] {
-  let result = filterVisibleCards(cards);
+  const result = filterVisibleCards(cards);
   if (!filters?.setCode && !filters?.locale) return result;
   return result.filter((card) => {
     if (filters.setCode && card.setCode !== filters.setCode) return false;

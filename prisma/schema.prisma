@@ -34,8 +34,21 @@ model Admin {
   id           String   @id @default(cuid())
   email        String   @unique
   passwordHash String
+  sessions     AdminSession[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model AdminSession {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  adminId   String
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([expiresAt])
 }
 
 model Card {
