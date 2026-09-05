@@ -1,10 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import {
-  createTestCart,
-  type CartTestState,
-} from "@/app/(store)/shopify-test/actions";
+import { addToTestCart, type CartTestState } from "@/app/(store)/shopify-test/actions";
 import type { ShopifyProductVariant } from "@/lib/shopify/products";
 
 const initialState: CartTestState = { status: "idle" };
@@ -16,22 +13,18 @@ function formatMoney(amount: string, currencyCode: string): string {
   }).format(Number(amount));
 }
 
-export function ShopifyCartTest({
-  variants,
-}: {
-  variants: ShopifyProductVariant[];
-}) {
-  const [state, action, pending] = useActionState(createTestCart, initialState);
+export function ShopifyCartTest({ variants }: { variants: ShopifyProductVariant[] }) {
+  const [state, action, pending] = useActionState(addToTestCart, initialState);
   const availableVariants = variants.filter((variant) => variant.availableForSale);
 
   return (
     <section className="space-y-4 rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-900 dark:bg-violet-950/30">
       <div>
         <h2 className="font-semibold text-zinc-950 dark:text-zinc-50">
-          Isolated Shopify cart test
+          Persistent Shopify cart test
         </h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Choose an in-stock variant. Shopify will create a new one-item test cart.
+          Choose an in-stock variant. Later additions reuse the same Shopify cart.
         </p>
       </div>
 
@@ -44,7 +37,7 @@ export function ShopifyCartTest({
               disabled={pending}
               className="rounded-lg bg-violet-600 px-3 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:cursor-wait disabled:opacity-60"
             >
-              {pending ? "Creating cart…" : `Add ${variant.title}`}
+              {pending ? "Updating cart…" : `Add ${variant.title}`}
             </button>
           </form>
         ))}
@@ -59,9 +52,16 @@ export function ShopifyCartTest({
       {state.status === "success" ? (
         <div className="space-y-3 border-t border-violet-200 pt-4 dark:border-violet-900">
           <p className="text-sm text-zinc-700 dark:text-zinc-300">
-            Shopify created a cart with {state.cart.totalQuantity} item: {" "}
-            <strong>{state.cart.line.productTitle}</strong> — {state.cart.line.variantTitle}.
+            Shopify cart: {state.cart.totalQuantity} item
+            {state.cart.totalQuantity === 1 ? "" : "s"}.
           </p>
+          <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+            {state.cart.lines.map((line) => (
+              <li key={`${line.productTitle}:${line.variantTitle}`}>
+                {line.quantity} × <strong>{line.productTitle}</strong> — {line.variantTitle}
+              </li>
+            ))}
+          </ul>
           <p className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
             Subtotal: {formatMoney(state.cart.subtotal.amount, state.cart.subtotal.currencyCode)}
           </p>
