@@ -13,7 +13,7 @@ type TcgdexCardJson = {
   error?: string;
 };
 
-async function fetchTcgdexImageForId(
+export async function getTcgdexCardImageUrl(
   tcgdexCardId: string,
   locale: CardLocale,
 ): Promise<string | null> {
@@ -46,7 +46,7 @@ export async function enrichTcgdexImages(
     if (hit !== undefined) return Promise.resolve(hit);
     let p = pending.get(key);
     if (!p) {
-      p = fetchTcgdexImageForId(id, locale).then((url) => {
+      p = getTcgdexCardImageUrl(id, locale).then((url) => {
         resolved.set(key, url);
         pending.delete(key);
         return url;

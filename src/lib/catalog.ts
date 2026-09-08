@@ -113,6 +113,8 @@ export const mockCards: CatalogCard[] = [
     nmCents: 4499,
     stockLabel: "In Stock",
     shopListed: true,
+    justtcgCardId:
+      "pokemon-sv-scarlet-violet-151-charizard-ex-006-165-double-rare",
     tcgdexCardId: "sv03.5-006",
   }),
   mockCard({

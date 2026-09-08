@@ -92,14 +92,27 @@ function parseStoredCart(raw: string | null): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    return parseStoredCart(window.localStorage.getItem(STORAGE_KEY));
-  });
+  // Keep the server and first browser render identical. The saved legacy cart
+  // is restored after hydration so localStorage cannot cause an HTML mismatch.
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [storageReady, setStorageReady] = useState(false);
 
   useEffect(() => {
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
+      setItems(parseStoredCart(window.localStorage.getItem(STORAGE_KEY)));
+      setStorageReady(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady) return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+  }, [items, storageReady]);
 
   const addItem = useCallback((item: AddToCartInput) => {
     setItems((current) => {

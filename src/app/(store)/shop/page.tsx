@@ -1,33 +1,91 @@
-import { CardGrid } from "@/components/card-grid";
-import { getShopCards } from "@/data/catalog";
+import Image from "next/image";
+import Link from "next/link";
+import { getShopifyProductArtwork } from "@/lib/shopify/artwork";
+import { getShopifyProducts, type ShopifyMoney } from "@/lib/shopify/products";
 
-export const metadata = {
-  title: "Shop",
-};
+export const metadata = { title: "Shop" };
 
-export const revalidate = 600;
+function formatMoney(money: ShopifyMoney): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: money.currencyCode,
+  }).format(Number(money.amount));
+}
 
 export default async function ShopPage() {
-  const listings = await getShopCards();
+  const products = await getShopifyProducts();
+  const artworkByProductId = new Map(
+    await Promise.all(
+      products.map(async (product) => [
+        product.id,
+        await getShopifyProductArtwork(product),
+      ] as const),
+    ),
+  );
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
-          Shop
+      <header>
+        <p className="text-sm font-medium text-violet-600 dark:text-violet-400">
+          Live Shopify inventory
+        </p>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+          Shop Pokémon singles
         </h1>
         <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">
-          Shop listings from our in-scope sets only: 151, Phantasmal Flames, and
-          Ascended Heroes (English). Add items to your cart before
-          Shopify checkout is connected.
+          Prices, conditions, and availability are loaded directly from Shopify.
         </p>
-      </div>
-      {listings.length === 0 ? (
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          No listings yet.
+      </header>
+
+      {products.length === 0 ? (
+        <p className="text-zinc-600 dark:text-zinc-400">
+          No products are currently published to the Headless channel.
         </p>
       ) : (
-        <CardGrid cards={listings} variant="shop" />
+        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {products.map((product, index) => {
+            const available = product.variants.filter((variant) => variant.availableForSale);
+            const displayVariant = available[0] ?? product.variants[0];
+            const artwork = artworkByProductId.get(product.id);
+            return (
+              <li key={product.id}>
+                <Link
+                  href={`/shop/products/${product.handle}`}
+                  className="group block h-full rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                >
+                  <div className="relative aspect-63/88 overflow-hidden rounded-xl bg-linear-to-br from-orange-600 to-red-950">
+                    {artwork ? (
+                      <Image
+                        src={artwork.url}
+                        alt={artwork.altText}
+                        fill
+                        loading={index === 0 ? "eager" : "lazy"}
+                        sizes="(max-width: 640px) 45vw, 220px"
+                        className="object-contain p-1"
+                      />
+                    ) : (
+                      <div className="flex h-full items-end p-4 text-5xl font-black text-white/25">
+                        {product.title.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  {artwork?.source === "tcgdex" ? (
+                    <p className="mt-2 text-[11px] text-zinc-400">Artwork from TCGdex</p>
+                  ) : null}
+                  <h2 className="mt-3 font-semibold text-zinc-950 dark:text-zinc-50">
+                    {product.title}
+                  </h2>
+                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                    {available.length} condition{available.length === 1 ? "" : "s"} in stock
+                  </p>
+                  <p className="mt-2 font-semibold text-zinc-950 dark:text-zinc-50">
+                    {displayVariant ? `From ${formatMoney(displayVariant.price)}` : "Unavailable"}
+                  </p>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </div>
   );

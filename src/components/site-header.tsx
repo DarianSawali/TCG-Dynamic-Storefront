@@ -36,7 +36,7 @@ const mainNav = [
   { href: "/shop", label: "Shop" },
 ] as const;
 
-export function SiteHeader() {
+export function SiteHeader({ shopifyItemCount }: { shopifyItemCount: number }) {
   const { itemCount } = useCart();
 
   return (
@@ -62,15 +62,21 @@ export function SiteHeader() {
               <span aria-hidden className={navUnderlineClass} />
             </Link>
           ))}
+          <Link href="/cart" className={navLinkClass}>
+            <span className="relative z-10">
+              Legacy cart{itemCount > 0 ? ` (${itemCount})` : ""}
+            </span>
+            <span aria-hidden className={navUnderlineClass} />
+          </Link>
           <Link
-            href="/cart"
-            aria-label="Shopping cart"
+            href="/shopify-cart"
+            aria-label={`Shopify cart with ${shopifyItemCount} items`}
             className={cartLinkClass}
           >
             <CartIcon className="size-4 transition-transform duration-200 group-hover:-translate-y-px group-active:translate-y-0 motion-reduce:group-hover:translate-y-0" />
-            {itemCount > 0 ? (
+            {shopifyItemCount > 0 ? (
               <span className="absolute -right-1 -top-1 inline-flex min-w-4 items-center justify-center rounded-full bg-fuchsia-500 px-1 text-[10px] font-semibold leading-4 text-white shadow-[0_0_10px_rgba(217,70,239,0.7)]">
-                {itemCount}
+                {shopifyItemCount}
               </span>
             ) : null}
             <span

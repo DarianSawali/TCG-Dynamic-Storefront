@@ -13,6 +13,7 @@
     "db:fetch-sets": "tsx scripts/fetch-tcgdex-sets.ts",
     "shopify:check": "tsx scripts/check-shopify.ts",
     "shopify:check-product": "tsx scripts/check-shopify-product.ts",
+    "pricing:check-policy": "tsx scripts/check-pricing-policy.ts",
     "admin:create": "tsx scripts/create-admin.ts",
     "db:setup": "prisma migrate deploy && prisma db seed",
     "postinstall": "prisma generate"

@@ -1,8 +1,8 @@
 "use server";
 
-import { isIP } from "node:net";
-import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { clearCartId, readCartId, writeCartId } from "@/lib/shopify/cart-cookie";
+import { getBuyerIp } from "@/lib/shopify/buyer-ip";
 import { storefrontQuery } from "@/lib/shopify/storefront";
 
 type Money = { amount: string; currencyCode: string };
@@ -25,7 +25,7 @@ type CartPayload = {
 type CartCreateData = { cartCreate: CartPayload };
 type CartLinesAddData = { cartLinesAdd: CartPayload };
 
-export type CartTestState =
+export type AddToCartState =
   | { status: "idle" }
   | { status: "error"; message: string }
   | { status: "success"; cart: {
@@ -55,16 +55,6 @@ const CART_FIELDS = /* GraphQL */ `
     }
   }
 `;
-
-function publicBuyerIp(value: string | null): string | undefined {
-  const ip = value?.split(",")[0]?.trim();
-  if (!ip || !isIP(ip)) return undefined;
-  if (
-    ip === "::1" || ip.startsWith("127.") || ip.startsWith("10.") ||
-    ip.startsWith("192.168.") || /^172\.(1[6-9]|2\d|3[01])\./.test(ip)
-  ) return undefined;
-  return ip;
-}
 
 async function createCart(merchandiseId: string, buyerIp?: string) {
   const data = await storefrontQuery<CartCreateData>(
@@ -100,22 +90,17 @@ function successfulCart(payload: CartPayload): ShopifyCart | null {
   return payload.userErrors.length === 0 ? payload.cart : null;
 }
 
-export async function addToTestCart(
-  _previousState: CartTestState,
+export async function addToShopifyCart(
+  _previousState: AddToCartState,
   formData: FormData,
-): Promise<CartTestState> {
+): Promise<AddToCartState> {
   const merchandiseId = String(formData.get("merchandiseId") ?? "");
   if (!/^gid:\/\/shopify\/ProductVariant\/\d+$/.test(merchandiseId)) {
     return { status: "error", message: "Invalid Shopify variant." };
   }
 
   try {
-    const requestHeaders = await headers();
-    const buyerIp = publicBuyerIp(
-      requestHeaders.get("x-vercel-forwarded-for") ??
-      requestHeaders.get("x-forwarded-for") ??
-      requestHeaders.get("x-real-ip"),
-    );
+    const buyerIp = await getBuyerIp();
 
     const savedCartId = await readCartId();
     let payload = savedCartId
@@ -142,6 +127,7 @@ export async function addToTestCart(
     }
 
     await writeCartId(cart.id);
+    revalidatePath("/", "layout");
     return {
       status: "success",
       cart: {

@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: "assets.tcgdex.net",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.shopify.com",
+        pathname: "/**",
+      },
     ],
   },
 };

@@ -55,6 +55,7 @@ export const getCatalogCards = cache(
       });
       if (dbRows.length > 0) {
         source = dbRows.map((row) => {
+          const fallback = mockCards.find((card) => card.slug === row.slug);
           const nmCents = row.listing?.marketPriceCents ?? null;
           const overrides = row.listing?.conditionPrices.length
             ? Object.fromEntries(
@@ -80,9 +81,9 @@ export const getCatalogCards = cache(
             marketPriceCents: nmPrice(conditionPrices),
             stockLabel: toStockLabel(row.listing?.stockStatus),
             shopListed: row.listing?.shopListed ?? false,
-            justtcgCardId: row.justtcgCardId ?? undefined,
-            tcgdexCardId: row.tcgdexCardId ?? undefined,
-            tcgdexImageUrl: row.tcgdexImageUrl,
+            justtcgCardId: row.justtcgCardId ?? fallback?.justtcgCardId,
+            tcgdexCardId: row.tcgdexCardId ?? fallback?.tcgdexCardId,
+            tcgdexImageUrl: row.tcgdexImageUrl ?? fallback?.tcgdexImageUrl,
           };
         });
       }

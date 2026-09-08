@@ -1,10 +1,13 @@
 "use client";
 
 import { useActionState } from "react";
-import { addToTestCart, type CartTestState } from "@/app/(store)/shopify-test/actions";
+import {
+  addToShopifyCart,
+  type AddToCartState,
+} from "@/app/(store)/shopify-actions";
 import type { ShopifyProductVariant } from "@/lib/shopify/products";
 
-const initialState: CartTestState = { status: "idle" };
+const initialState: AddToCartState = { status: "idle" };
 
 function formatMoney(amount: string, currencyCode: string): string {
   return new Intl.NumberFormat("en-US", {
@@ -14,7 +17,7 @@ function formatMoney(amount: string, currencyCode: string): string {
 }
 
 export function ShopifyCartTest({ variants }: { variants: ShopifyProductVariant[] }) {
-  const [state, action, pending] = useActionState(addToTestCart, initialState);
+  const [state, action, pending] = useActionState(addToShopifyCart, initialState);
   const availableVariants = variants.filter((variant) => variant.availableForSale);
 
   return (
