@@ -69,6 +69,7 @@ export async function mergeJustTcgPrices(
     cards.map((c) => ({
       ...c,
       priceSource: "mock" as const,
+      livePriceConditions: [],
       imageUrl: null,
     }));
 
@@ -111,11 +112,11 @@ export async function mergeJustTcgPrices(
 
   return cards.map((card) => {
     if (!card.justtcgCardId) {
-      return { ...card, priceSource: "mock" as const, imageUrl: null };
+      return { ...card, priceSource: "mock" as const, livePriceConditions: [], imageUrl: null };
     }
     const live = priceByCardId.get(card.justtcgCardId);
     if (!live || Object.keys(live).length === 0) {
-      return { ...card, priceSource: "mock" as const, imageUrl: null };
+      return { ...card, priceSource: "mock" as const, livePriceConditions: [], imageUrl: null };
     }
 
     const conditionPrices = mergeConditionPrices(card, live);
@@ -124,6 +125,9 @@ export async function mergeJustTcgPrices(
       conditionPrices,
       marketPriceCents: nmPrice(conditionPrices),
       priceSource: "justtcg" as const,
+      livePriceConditions: CARD_CONDITIONS.filter(
+        (condition) => live[condition] != null,
+      ),
       imageUrl: null,
     };
   });

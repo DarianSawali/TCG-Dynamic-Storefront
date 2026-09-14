@@ -53,6 +53,8 @@ export type CatalogCard = {
 /** After `getCatalogCards()` merges JustTCG prices and TCGdex image URLs. */
 export type CatalogCardWithPricing = CatalogCard & {
   priceSource: PriceSource;
+  /** Conditions whose current values were returned by JustTCG (not fallback data). */
+  livePriceConditions: CardCondition[];
   /** Full HTTPS URL (e.g. …/high.webp) or null to use gradient placeholder. */
   imageUrl: string | null;
 };

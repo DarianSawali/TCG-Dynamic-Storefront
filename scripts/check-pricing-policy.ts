@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { evaluatePriceChange } from "../src/lib/pricing/policy";
+import {
+  evaluatePriceChange,
+  previousLargeDecreaseAt,
+} from "../src/lib/pricing/policy";
 
 const now = new Date("2026-09-08T18:00:00.000Z");
 const fresh = new Date("2026-09-08T17:00:00.000Z");
@@ -28,6 +31,22 @@ assert.equal(
     now,
   }).decision,
   "skipped",
+);
+assert.equal(
+  previousLargeDecreaseAt(
+    10_00,
+    { amountCents: 7_50, fetchedAt: new Date("2026-09-08T11:00:00.000Z") },
+    now,
+  )?.toISOString(),
+  "2026-09-08T11:00:00.000Z",
+);
+assert.equal(
+  previousLargeDecreaseAt(
+    10_00,
+    { amountCents: 9_50, fetchedAt: new Date("2026-09-08T11:00:00.000Z") },
+    now,
+  ),
+  null,
 );
 
 console.log("Pricing policy checks passed.");

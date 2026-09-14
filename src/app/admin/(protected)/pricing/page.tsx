@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
+import { ApprovePricesForm } from "@/app/admin/(protected)/pricing/approve-prices-form";
 import { AdminNav } from "@/components/admin-nav";
 import { getCatalogCards } from "@/data/catalog";
-import type { CardCondition } from "@/lib/conditions";
-import { evaluatePriceChange, type PriceDecision } from "@/lib/pricing/policy";
+import {
+  evaluatePriceChange,
+  previousLargeDecreaseAt,
+  type PriceDecision,
+} from "@/lib/pricing/policy";
+import {
+  observeJustTcgPrices,
+  priceObservationKey,
+  type PriceObservationHistory,
+} from "@/lib/pricing/observations";
+import {
+  conditionFromShopifyVariantTitle,
+  findCatalogCardForShopifyProduct,
+} from "@/lib/pricing/shopify-match";
+import { getShopifyAdminStatus } from "@/lib/shopify/admin";
 import { getShopifyProducts } from "@/lib/shopify/products";
 
 export const metadata: Metadata = {
@@ -17,14 +31,6 @@ const decisionLabel: Record<PriceDecision, string> = {
   skipped: "Skipped",
 };
 
-function normalize(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function variantCondition(title: string): CardCondition | null {
-  return title.match(/\b(NM|LP|MP|HP|DMG)\b/i)?.[1].toUpperCase() as CardCondition ?? null;
-}
-
 function cents(amount: string): number {
   return Math.round(Number(amount) * 100);
 }
@@ -35,31 +41,56 @@ function money(value: number | null, currency = "USD"): string {
 }
 
 export default async function AdminPricingPage() {
-  const [shopifyResult, catalogResult] = await Promise.allSettled([
+  const [shopifyResult, catalogResult, adminResult] = await Promise.allSettled([
     getShopifyProducts(),
     getCatalogCards(),
+    getShopifyAdminStatus(),
   ]);
   const products = shopifyResult.status === "fulfilled" ? shopifyResult.value : [];
   const cards = catalogResult.status === "fulfilled" ? catalogResult.value : [];
+  const adminStatus = adminResult.status === "fulfilled" ? adminResult.value : null;
   const checkedAt = new Date();
+  let priceHistory: PriceObservationHistory = {
+    previousByCardCondition: new Map(),
+    recordedCount: 0,
+  };
+  try {
+    priceHistory = await observeJustTcgPrices(cards, checkedAt);
+  } catch (error) {
+    console.error("Could not persist JustTCG price observations", error);
+  }
 
   const rows = products.flatMap((product) => {
-    const card = cards.find(
-      (candidate) => candidate.locale === "en" && normalize(candidate.name) === normalize(product.title),
-    );
+    const card = findCatalogCardForShopifyProduct(product, cards);
     return product.variants.map((variant) => {
-      const condition = variantCondition(variant.title);
-      const marketCents = condition
+      const condition = conditionFromShopifyVariantTitle(variant.title);
+      const conditionPriceCents = condition
         ? card?.conditionPrices.find((price) => price.condition === condition)?.priceCents ?? null
         : null;
-      const isLive = card?.priceSource === "justtcg";
+      const isLive = Boolean(
+        condition &&
+          card?.priceSource === "justtcg" &&
+          card.livePriceConditions.includes(condition),
+      );
+      const marketCents = isLive ? conditionPriceCents : null;
       const sameCurrency = variant.price.currencyCode === "USD";
       const targetCents = isLive && sameCurrency ? marketCents : null;
+      const currentPriceCents = cents(variant.price.amount);
+      const previousObservation = condition && card
+        ? priceHistory.previousByCardCondition.get(
+            priceObservationKey(card.slug, condition),
+          )
+        : null;
       const evaluation = evaluatePriceChange({
-        currentPriceCents: cents(variant.price.amount),
+        currentPriceCents,
         targetPriceCents: targetCents,
         marketFetchedAt: targetCents == null ? null : checkedAt,
         now: checkedAt,
+        previousLargeDecreaseAt: previousLargeDecreaseAt(
+          currentPriceCents,
+          previousObservation,
+          checkedAt,
+        ),
       });
 
       let reason = evaluation.reason;
@@ -71,6 +102,15 @@ export default async function AdminPricingPage() {
       return { product, variant, condition, marketCents, evaluation: { ...evaluation, reason } };
     });
   });
+  const approvals = products.map((product) => ({
+    product,
+    count: rows.filter(
+      (row) =>
+        row.product.id === product.id &&
+        (row.evaluation.decision === "auto-update" ||
+          row.evaluation.decision === "approval-required"),
+    ).length,
+  })).filter(({ count }) => count > 0);
 
   return (
     <div className="space-y-6">
@@ -80,10 +120,32 @@ export default async function AdminPricingPage() {
           Pricing
         </h1>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          Dry run only. This page compares Shopify prices with eligible JustTCG
-          condition prices and never writes to Shopify.
+          Compare Shopify with live JustTCG prices first. Updates only run after
+          an authenticated admin explicitly confirms a product-level bulk change.
         </p>
       </div>
+
+      <section className={`rounded-xl border p-5 ${
+        adminStatus?.canWriteProducts
+          ? "border-emerald-300 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/30"
+          : "border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30"
+      }`}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-semibold text-zinc-950 dark:text-zinc-50">
+              Shopify Admin API
+            </h2>
+            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              {adminStatus
+                ? `Connected to ${adminStatus.storeName} (${adminStatus.domain}) · ${adminStatus.currencyCode}`
+                : "Not connected. Check the server credentials and app installation."}
+            </p>
+          </div>
+          <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold dark:bg-zinc-950/60">
+            {adminStatus?.canWriteProducts ? "write_products granted" : "Connection unavailable"}
+          </span>
+        </div>
+      </section>
 
       <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <h2 className="font-semibold text-zinc-950 dark:text-zinc-50">Active guardrails</h2>
@@ -101,6 +163,11 @@ export default async function AdminPricingPage() {
         <div className="border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
           <h2 className="font-semibold text-zinc-950 dark:text-zinc-50">Current dry run</h2>
           <p className="mt-1 text-xs text-zinc-500">Target currently equals market price; markup and currency conversion are not applied yet.</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            {priceHistory.recordedCount > 0
+              ? `${priceHistory.recordedCount} new live condition observations saved for timed confirmation.`
+              : "Live observations are already recorded for the current 6-hour window."}
+          </p>
         </div>
         {rows.length === 0 ? (
           <p className="p-6 text-sm text-zinc-600 dark:text-zinc-400">
@@ -135,6 +202,24 @@ export default async function AdminPricingPage() {
             </table>
           </div>
         )}
+        {adminStatus?.canWriteProducts && approvals.length > 0 ? (
+          <div className="space-y-3 border-t border-zinc-200 px-6 py-4 dark:border-zinc-800">
+            <p className="text-xs text-zinc-500">
+              Approval refreshes market data on the server and updates only
+              eligible conditions in one atomic Shopify request. Prices awaiting
+              timed confirmation are excluded.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {approvals.map(({ product, count }) => (
+                <ApprovePricesForm
+                  key={product.id}
+                  handle={product.handle}
+                  count={count}
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
       </section>
     </div>
   );

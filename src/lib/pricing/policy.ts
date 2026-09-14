@@ -32,6 +32,28 @@ export type PricePolicyInput = {
   manualLockUntil?: Date | null;
 };
 
+export type HistoricalPriceObservation = {
+  amountCents: number;
+  fetchedAt: Date;
+};
+
+export function previousLargeDecreaseAt(
+  currentPriceCents: number,
+  observation: HistoricalPriceObservation | null | undefined,
+  now: Date,
+): Date | null {
+  if (!observation) return null;
+  const historicalDecision = evaluatePriceChange({
+    currentPriceCents,
+    targetPriceCents: observation.amountCents,
+    marketFetchedAt: observation.fetchedAt,
+    now,
+  });
+  return historicalDecision.decision === "awaiting-confirmation"
+    ? observation.fetchedAt
+    : null;
+}
+
 export function evaluatePriceChange(input: PricePolicyInput): PriceEvaluation {
   const now = input.now ?? new Date();
   const target = input.targetPriceCents;
