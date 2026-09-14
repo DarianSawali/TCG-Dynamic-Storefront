@@ -9,6 +9,15 @@
   }
 }
 
+@keyframes hero-ken-burns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.06);
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

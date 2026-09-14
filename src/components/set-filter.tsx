@@ -15,11 +15,11 @@ export function SetFilter({ activeSetCode, activeLocale }: SetFilterProps) {
   const allActive = !activeSetCode && !activeLocale;
 
   return (
-    <div className="flex flex-wrap gap-2">
-      <Link
-        href="/cards"
-        className={filterClass(allActive)}
-      >
+    <nav
+      aria-label="Set boxes"
+      className="flex flex-wrap gap-2 border border-dashed border-zinc-600 bg-zinc-950/80 p-2"
+    >
+      <Link href="/cards" className={tabClass(allActive)}>
         All sets
       </Link>
       {getVisibleStoreSets().map((set) => {
@@ -35,25 +35,29 @@ export function SetFilter({ activeSetCode, activeLocale }: SetFilterProps) {
             : set.name;
 
         return (
-          <Link key={`${set.code}-${set.locale}`} href={href} className={filterClass(active)}>
+          <Link
+            key={`${set.code}-${set.locale}`}
+            href={href}
+            className={tabClass(active)}
+          >
             {label}
             {showLocaleBadge(set.locale) ? (
-              <span className="ml-1.5 rounded bg-black/10 px-1.5 py-0.5 text-[10px] font-bold dark:bg-white/10">
+              <span className="ml-1.5 rounded bg-black/20 px-1.5 py-0.5 text-[10px] font-bold dark:bg-white/10">
                 {localeBadge(set.locale)}
               </span>
             ) : null}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }
 
-function filterClass(active: boolean): string {
+function tabClass(active: boolean): string {
   return [
-    "inline-flex items-center rounded-full border px-3 py-1.5 text-sm font-medium transition",
+    "inline-flex items-center border px-3 py-2 font-mono text-xs font-medium tracking-wide uppercase transition sm:text-sm",
     active
-      ? "border-violet-600 bg-violet-600 text-white dark:border-violet-500 dark:bg-violet-600"
-      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-zinc-600",
+      ? "border-violet-400/80 bg-violet-950/70 text-violet-100 shadow-[0_0_16px_-6px_rgba(167,139,250,0.65)]"
+      : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200",
   ].join(" ");
 }

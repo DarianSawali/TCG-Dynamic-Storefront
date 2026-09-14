@@ -1,4 +1,4 @@
-import { CardGrid } from "@/components/card-grid";
+import { ExplorePcBox } from "@/components/pc-box/explore-pc-box";
 import { SetFilter } from "@/components/set-filter";
 import { getCatalogCards } from "@/data/catalog";
 import { getVisibleStoreSets, isLocaleVisible } from "@/lib/sets";
@@ -35,30 +35,53 @@ export default async function CardsPage({ searchParams }: Props) {
       )
     : undefined;
 
+  const boxTitle = activeSet
+    ? activeSet.name.toUpperCase()
+    : "ALL SETS";
+
   return (
-    <div className="space-y-8">
+    <div className="-mx-4 space-y-6 bg-zinc-900 px-4 py-8 sm:-mx-6 sm:px-6 sm:py-10">
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
-          Explore the catalog
-        </h1>
-        <p className="max-w-2xl text-zinc-600 dark:text-zinc-400">
-          In scope for this shop: <strong>151</strong>,{" "}
-          <strong>Phantasmal Flames</strong>, and <strong>Ascended Heroes</strong> (English).
-          Art from TCGdex; optional JustTCG key for live NM–DMG prices.
-        </p>
+        <div className="space-y-2">
+          <p className="font-mono text-[11px] tracking-[0.2em] text-violet-300/90 uppercase">
+            Catalog · PC storage
+          </p>
+          <h1 className="font-mono text-xl tracking-wide text-zinc-100 sm:text-2xl">
+            Explore the catalog
+          </h1>
+          <p className="max-w-2xl font-mono text-xs leading-relaxed text-zinc-500 sm:text-sm">
+            In scope: <span className="text-zinc-300">151</span>,{" "}
+            <span className="text-zinc-300">Phantasmal Flames</span>, and{" "}
+            <span className="text-zinc-300">Ascended Heroes</span> (English).
+            Pick a set tab, browse slots by collector number, and use ◀ ▶ to see
+            more boxes.
+          </p>
+        </div>
+
         <SetFilter activeSetCode={setCode} activeLocale={locale} />
+
         {activeSet ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="font-mono text-xs text-zinc-500">
             Showing {cards.length} card{cards.length === 1 ? "" : "s"} from{" "}
-            <span className="font-medium text-zinc-800 dark:text-zinc-200">
+            <span className="text-zinc-300">
               {activeSet.name}
               {activeSet.nameJa ? ` (${activeSet.nameJa})` : ""}
             </span>
-            .
+            , ordered by #.
           </p>
-        ) : null}
+        ) : (
+          <p className="font-mono text-xs text-zinc-500">
+            Showing {cards.length} card{cards.length === 1 ? "" : "s"} across all
+            sets, ordered by # within the current filter.
+          </p>
+        )}
       </div>
-      <CardGrid cards={cards} variant="catalog" />
+
+      <ExplorePcBox
+        key={`${setCode ?? "all"}:${locale ?? "all"}`}
+        cards={cards}
+        boxTitle={boxTitle}
+      />
     </div>
   );
 }
