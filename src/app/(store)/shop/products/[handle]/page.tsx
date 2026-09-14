@@ -15,7 +15,7 @@ export default async function ShopifyProductPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
-      <Link href="/shop" className="text-sm font-medium text-violet-600 hover:underline dark:text-violet-400">
+      <Link href="/shop" className="text-sm font-medium text-pokedex hover:text-pokedex-bright hover:underline">
         ← Back to shop
       </Link>
       <div className="grid gap-8 md:grid-cols-[minmax(0,360px)_1fr]">
@@ -40,8 +40,8 @@ export default async function ShopifyProductPage({ params }: Props) {
         ) : null}
         <div className="space-y-6">
           <header>
-            <p className="text-sm font-medium text-violet-600 dark:text-violet-400">Live Shopify product</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+            <p className="text-sm font-medium text-pokedex">Live Shopify product</p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-pokedex-cream">
               {product.title}
             </h1>
             <p className="mt-3 text-zinc-600 dark:text-zinc-400">

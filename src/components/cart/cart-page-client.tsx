@@ -42,7 +42,7 @@ export function CartPageClient() {
   if (items.length === 0) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+        <h1 className="text-2xl font-semibold tracking-tight text-pokedex-cream">
           Your cart
         </h1>
         <p className="max-w-xl text-zinc-600 dark:text-zinc-400">
@@ -50,7 +50,7 @@ export function CartPageClient() {
         </p>
         <Link
           href="/shop"
-          className="inline-flex text-sm font-medium text-violet-600 underline-offset-4 hover:text-violet-500 hover:underline dark:text-violet-400 dark:hover:text-violet-300"
+          className="inline-flex text-sm font-medium text-pokedex underline-offset-4 hover:text-pokedex-bright hover:underline"
         >
           Continue shopping
         </Link>
@@ -62,7 +62,7 @@ export function CartPageClient() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+          <h1 className="text-2xl font-semibold tracking-tight text-pokedex-cream">
             Your cart
           </h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
@@ -84,7 +84,7 @@ export function CartPageClient() {
           return (
           <li
             key={id}
-            className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center dark:border-zinc-800 dark:bg-zinc-950"
+            className="flex flex-col gap-3 rounded-xl border border-[#625253] bg-[#1d1d1f] p-3 shadow-sm sm:flex-row sm:items-center"
           >
             <Link href={`/cards/${item.slug}`} className="flex items-center gap-3">
               <div className="relative size-20 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-900">
@@ -101,7 +101,7 @@ export function CartPageClient() {
                 )}
               </div>
               <div>
-                <p className="font-medium text-zinc-950 dark:text-zinc-50">{item.name}</p>
+                <p className="font-medium text-pokedex-cream">{item.name}</p>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">{item.setName}</p>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   {item.conditionLabel}{" "}
@@ -120,7 +120,7 @@ export function CartPageClient() {
                 value={item.quantity}
                 onChange={(next) => updateQuantity(id, next)}
               />
-              <p className="w-24 text-right font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">
+              <p className="w-24 text-right font-semibold tabular-nums text-pokedex-cream">
                 {formatPrice((item.marketPriceCents ?? 0) * item.quantity)}
               </p>
               <button
@@ -136,9 +136,9 @@ export function CartPageClient() {
         })}
       </ul>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-pokedex/45 bg-pokedex-deep/35 px-4 py-3">
         <p className="text-sm text-zinc-600 dark:text-zinc-400">Subtotal</p>
-        <p className="text-xl font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">
+        <p className="text-xl font-semibold tabular-nums text-pokedex-cream">
           {formatPrice(subtotalCents)}
         </p>
       </div>

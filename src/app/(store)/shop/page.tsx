@@ -26,19 +26,19 @@ export default async function ShopPage() {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-sm font-medium text-violet-600 dark:text-violet-400">
+        <p className="text-sm font-medium text-pokedex">
           Live Shopify inventory
         </p>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-pokedex-cream">
           Shop Pokémon singles
         </h1>
-        <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 max-w-2xl text-pokedex-muted">
           Prices, conditions, and availability are loaded directly from Shopify.
         </p>
       </header>
 
       {products.length === 0 ? (
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <p className="text-pokedex-muted">
           No products are currently published to the Headless channel.
         </p>
       ) : (
@@ -51,7 +51,7 @@ export default async function ShopPage() {
               <li key={product.id}>
                 <Link
                   href={`/shop/products/${product.handle}`}
-                  className="group block h-full rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                  className="group block h-full rounded-2xl border border-[#625253] bg-[#1d1d1f] p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-pokedex/70 hover:shadow-[0_12px_30px_-20px_rgba(223,90,72,0.8)]"
                 >
                   <div className="relative aspect-63/88 overflow-hidden rounded-xl bg-linear-to-br from-orange-600 to-red-950">
                     {artwork ? (
@@ -72,13 +72,13 @@ export default async function ShopPage() {
                   {artwork?.source === "tcgdex" ? (
                     <p className="mt-2 text-[11px] text-zinc-400">Artwork from TCGdex</p>
                   ) : null}
-                  <h2 className="mt-3 font-semibold text-zinc-950 dark:text-zinc-50">
+                  <h2 className="mt-3 font-semibold text-pokedex-cream">
                     {product.title}
                   </h2>
-                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-1 text-sm text-pokedex-muted">
                     {available.length} condition{available.length === 1 ? "" : "s"} in stock
                   </p>
-                  <p className="mt-2 font-semibold text-zinc-950 dark:text-zinc-50">
+                  <p className="mt-2 font-semibold text-pokedex-cream">
                     {displayVariant ? `From ${formatMoney(displayVariant.price)}` : "Unavailable"}
                   </p>
                 </Link>

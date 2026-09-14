@@ -47,7 +47,7 @@ function DetailPanel({ card }: { card: PcBoxCard | null }) {
         {card.name}
       </h2>
 
-      <div className="mt-5 flex aspect-[5/7] w-full max-w-[11rem] items-center justify-center border border-dashed border-zinc-600 bg-zinc-950/60 font-mono text-[10px] tracking-widest text-zinc-500 uppercase">
+      <div className="mt-5 flex aspect-[5/7] w-full max-w-[11rem] items-center justify-center border border-[#625253] bg-[#29282a] font-mono text-[10px] tracking-widest text-pokedex-muted uppercase">
         {card.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -68,7 +68,7 @@ function DetailPanel({ card }: { card: PcBoxCard | null }) {
 
       <button
         type="button"
-        className="mt-auto w-full max-w-[14rem] border border-zinc-500 bg-zinc-950 px-3 py-2.5 font-mono text-xs tracking-wide text-zinc-100 transition-colors hover:border-zinc-300 hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+        className="mt-auto w-full max-w-[14rem] border border-zinc-500 bg-zinc-950 px-3 py-2.5 font-mono text-xs tracking-wide text-zinc-100 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex"
       >
         [ ADD TO CART ]
       </button>
@@ -99,12 +99,12 @@ function SlotCell({
       aria-pressed={selected}
       className={[
         "aspect-square border transition-[border-color,background-color,box-shadow,transform] duration-150",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex",
         filled
-          ? "border-zinc-400 bg-zinc-900/80 hover:border-zinc-200"
-          : "border-zinc-700 bg-transparent hover:border-zinc-500",
+          ? "border-[#625253] bg-[#29282a] hover:border-pokedex/70"
+          : "border-[#4b4142] bg-[#171719] hover:border-[#625253]",
         selected
-          ? "border-violet-300 shadow-[0_0_0_1px_rgba(196,181,253,0.7),0_0_18px_-4px_rgba(167,139,250,0.55)] scale-[1.03]"
+          ? "border-pokedex-bright shadow-[0_0_0_1px_rgba(255,121,101,0.7),0_0_18px_-4px_rgba(223,90,72,0.55)] scale-[1.03]"
           : "",
       ].join(" ")}
     >
@@ -197,14 +197,14 @@ export function PcBoxPanel() {
   return (
     <section
       aria-label="PC box layout prototype"
-      className="overflow-hidden rounded-2xl border border-zinc-600 bg-zinc-950 text-zinc-100 shadow-[0_0_0_1px_rgba(63,63,70,0.8)]"
+      className="overflow-hidden rounded-2xl border border-[#625253] bg-[#1d1d1f] text-pokedex-cream shadow-[0_18px_50px_-30px_rgba(223,90,72,0.7)]"
     >
-      <header className="flex items-center justify-between gap-3 border-b border-dashed border-zinc-600 px-3 py-3 sm:px-4">
+      <header className="flex items-center justify-between gap-3 border-b border-[#625253] bg-pokedex-deep/45 px-3 py-3 sm:px-4">
         <button
           type="button"
           onClick={() => goToBox(boxIndex - 1)}
           aria-label="Previous box"
-          className="flex size-9 shrink-0 items-center justify-center border border-zinc-600 font-mono text-sm text-zinc-300 transition-colors hover:border-zinc-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+          className="flex size-9 shrink-0 items-center justify-center border border-zinc-600 font-mono text-sm text-zinc-300 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex"
         >
           ◀
         </button>
@@ -215,7 +215,7 @@ export function PcBoxPanel() {
           type="button"
           onClick={() => goToBox(boxIndex + 1)}
           aria-label="Next box"
-          className="flex size-9 shrink-0 items-center justify-center border border-zinc-600 font-mono text-sm text-zinc-300 transition-colors hover:border-zinc-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+          className="flex size-9 shrink-0 items-center justify-center border border-zinc-600 font-mono text-sm text-zinc-300 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex"
         >
           ▶
         </button>
@@ -275,26 +275,26 @@ export function PcBoxPanel() {
           }}
           className={[
             "group relative z-10 flex shrink-0 items-center justify-center touch-none",
-            "bg-zinc-950 hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-violet-400",
+            "bg-zinc-950 hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-pokedex",
             isLarge
-              ? "w-3 cursor-col-resize border-x border-dashed border-zinc-600"
-              : "h-3 cursor-row-resize border-y border-dashed border-zinc-600",
+              ? "w-3 cursor-col-resize border-x border-[#625253]"
+              : "h-3 cursor-row-resize border-y border-[#625253]",
             dragging ? "bg-zinc-900" : "",
           ].join(" ")}
         >
           <span
             aria-hidden
             className={[
-              "rounded-full bg-zinc-500 transition-colors group-hover:bg-violet-300 group-focus-visible:bg-violet-300",
+              "rounded-full bg-zinc-500 transition-colors group-hover:bg-pokedex-bright group-focus-visible:bg-pokedex-bright",
               isLarge ? "h-8 w-0.5" : "h-0.5 w-8",
-              dragging ? "bg-violet-300" : "",
+              dragging ? "bg-pokedex-bright" : "",
             ].join(" ")}
           />
         </div>
 
         <div className="@container flex min-h-0 min-w-0 flex-1 flex-col p-4 sm:p-5">
           <div
-            className="grid grid-cols-3 gap-2 @min-[240px]:grid-cols-4 @min-[340px]:grid-cols-5 @min-[440px]:grid-cols-6 sm:gap-2.5"
+            className="grid grid-cols-2 gap-2 @min-[250px]:grid-cols-3 @min-[360px]:grid-cols-4 @min-[480px]:grid-cols-5 @min-[600px]:grid-cols-6 @min-[720px]:gap-3"
             role="listbox"
             aria-label={`Slots in ${box.title}`}
           >

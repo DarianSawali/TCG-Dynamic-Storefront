@@ -24,11 +24,11 @@ export function ConditionBuyPanel({ card }: ConditionBuyPanelProps) {
   const disabled = card.stockLabel === "Out of Stock";
 
   return (
-    <div className="max-w-md space-y-4 rounded-xl border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-900/50">
+    <div className="max-w-md space-y-4 rounded-xl border border-[#625253] bg-[#1d1d1f] p-4">
       <div>
         <label
           htmlFor="card-condition"
-          className="text-sm font-medium text-zinc-950 dark:text-zinc-50"
+          className="text-sm font-medium text-pokedex-cream"
         >
           Condition
         </label>
@@ -36,7 +36,7 @@ export function ConditionBuyPanel({ card }: ConditionBuyPanelProps) {
           id="card-condition"
           value={condition}
           onChange={(e) => setCondition(e.target.value as CardCondition)}
-          className="mt-1.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-950 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
+          className="mt-1.5 w-full rounded-lg border border-[#625253] bg-[#29282a] px-3 py-2 text-sm text-pokedex-cream focus:border-pokedex focus:outline-none"
         >
           {card.conditionPrices.map((row) => (
             <option key={row.condition} value={row.condition}>
@@ -52,14 +52,14 @@ export function ConditionBuyPanel({ card }: ConditionBuyPanelProps) {
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Your price</p>
-          <p className="text-2xl font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">
+          <p className="text-2xl font-semibold tabular-nums text-pokedex-cream">
             {formatPrice(selectedPrice)}
           </p>
         </div>
         <button
           type="button"
           disabled={disabled}
-          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
+          className="inline-flex shrink-0 items-center justify-center rounded-lg bg-pokedex px-4 py-2.5 text-sm font-medium text-white transition hover:bg-pokedex-bright disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
           onClick={() => {
             addItem({
               slug: card.slug,

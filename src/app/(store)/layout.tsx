@@ -20,11 +20,13 @@ export default async function StoreLayout({
 
   return (
     <CartProvider>
-      <SiteHeader shopifyItemCount={shopifyItemCount} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
-        {children}
-      </main>
-      <SiteFooter />
+      <div className="flex min-h-screen flex-1 flex-col bg-[#101011] text-pokedex-cream">
+        <SiteHeader shopifyItemCount={shopifyItemCount} />
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
+          {children}
+        </main>
+        <SiteFooter />
+      </div>
     </CartProvider>
   );
 }

@@ -13,9 +13,9 @@ export function ConditionPriceTable({
   highlight,
 }: ConditionPriceTableProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+    <div className="overflow-hidden rounded-xl border border-[#625253]">
       <table className="w-full text-left text-sm">
-        <thead className="bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500 dark:bg-zinc-900/80 dark:text-zinc-400">
+        <thead className="bg-pokedex-deep/45 text-xs uppercase tracking-wide text-pokedex-muted">
           <tr>
             <th className="px-3 py-2 font-medium">Condition</th>
             <th className="px-3 py-2 font-medium">Code</th>
@@ -30,12 +30,12 @@ export function ConditionPriceTable({
                 key={row.condition}
                 className={
                   active
-                    ? "bg-violet-50/80 dark:bg-violet-950/30"
-                    : "bg-white dark:bg-zinc-950"
+                    ? "bg-pokedex/10 dark:bg-pokedex-deep/30"
+                    : "bg-[#1d1d1f]"
                 }
               >
                 <td className="px-3 py-2.5">
-                  <span className="font-medium text-zinc-950 dark:text-zinc-50">
+                  <span className="font-medium text-pokedex-cream">
                     {row.label}
                   </span>
                   <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
@@ -47,7 +47,7 @@ export function ConditionPriceTable({
                     {row.shortLabel}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 text-right tabular-nums font-medium text-zinc-950 dark:text-zinc-50">
+                <td className="px-3 py-2.5 text-right tabular-nums font-medium text-pokedex-cream">
                   {formatPrice(row.priceCents)}
                 </td>
               </tr>

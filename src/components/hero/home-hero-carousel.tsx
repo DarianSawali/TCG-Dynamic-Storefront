@@ -17,7 +17,7 @@ const DEFAULT_SLIDES: HeroSlide[] = [
   {
     id: "umbreon",
     imageSrc: "/hero/umbreon.jpg",
-    gradient: "from-indigo-950 via-violet-900 to-zinc-950",
+    gradient: "from-indigo-950 via-red-950 to-zinc-950",
     label: "Umbreon",
     headline: "Night market energy.",
   },
@@ -159,7 +159,7 @@ export function HomeHeroCarousel({
               : "translate-y-4 opacity-0 motion-reduce:translate-y-0 motion-reduce:opacity-100",
           ].join(" ")}
         >
-          <p className="font-mono text-[11px] tracking-[0.28em] text-violet-300/90 uppercase">
+          <p className="font-mono text-[11px] tracking-[0.28em] text-pokedex-bright/90 uppercase">
             PokeCell
           </p>
           <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
@@ -184,7 +184,7 @@ export function HomeHeroCarousel({
           >
             <Link
               href="/cards"
-              className="inline-flex items-center justify-center rounded-lg bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-violet-400"
+              className="inline-flex items-center justify-center border border-pokedex bg-pokedex px-4 py-2.5 text-sm font-medium text-white transition-colors hover:border-pokedex-bright hover:bg-pokedex-bright"
             >
               Explore catalog
             </Link>
@@ -218,7 +218,7 @@ export function HomeHeroCarousel({
                 className={[
                   "h-1.5 rounded-full transition-[width,background-color] duration-300",
                   i === index
-                    ? "w-8 bg-violet-400"
+                    ? "w-8 bg-pokedex-bright"
                     : "w-1.5 bg-white/35 hover:bg-white/55",
                 ].join(" ")}
               />

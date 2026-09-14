@@ -70,7 +70,7 @@ function CardMeta({ card }: { card: CatalogCardWithPricing }) {
 
   return (
     <div className="mt-3 flex min-h-24 flex-col justify-start space-y-1.5">
-      <h2 className="line-clamp-2 text-base font-semibold leading-snug text-zinc-950 dark:text-zinc-50">
+      <h2 className="line-clamp-2 text-base font-semibold leading-snug text-pokedex-cream">
         {card.name}
       </h2>
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -104,7 +104,7 @@ export function CardTile({ card, variant }: CardTileProps) {
     return (
       <Link
         href={href}
-        className="group flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+        className="group flex h-full flex-col rounded-2xl border border-[#625253] bg-[#1d1d1f] p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-pokedex/70 hover:shadow-[0_12px_30px_-20px_rgba(223,90,72,0.8)]"
       >
         <CardArt card={card} />
         <CardMeta card={card} />
@@ -113,18 +113,18 @@ export function CardTile({ card, variant }: CardTileProps) {
   }
 
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+    <article className="flex h-full flex-col rounded-2xl border border-[#625253] bg-[#1d1d1f] p-3 shadow-sm">
       <Link href={href} className="block grow transition hover:opacity-95">
         <CardArt card={card} />
         <CardMeta card={card} />
       </Link>
       <div className="mt-4 flex flex-col gap-2 border-t border-zinc-100 pt-3 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800">
-        <span className="text-lg font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">
+        <span className="text-lg font-semibold tabular-nums text-pokedex-cream">
           {formatPrice(card.marketPriceCents)}
         </span>
         <AddToCartButton
           card={card}
-          className="inline-flex w-full items-center justify-center rounded-lg bg-violet-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 sm:w-auto dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
+          className="inline-flex w-full items-center justify-center rounded-lg bg-pokedex px-3 py-2 text-sm font-medium text-white transition hover:bg-pokedex-bright disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 sm:w-auto dark:disabled:bg-zinc-800 dark:disabled:text-zinc-500"
         />
       </div>
     </article>

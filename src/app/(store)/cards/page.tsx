@@ -40,10 +40,10 @@ export default async function CardsPage({ searchParams }: Props) {
     : "ALL SETS";
 
   return (
-    <div className="-mx-4 space-y-6 bg-zinc-900 px-4 py-8 sm:-mx-6 sm:px-6 sm:py-10">
+    <div className="-mx-4 space-y-6 bg-[#101011] px-4 py-8 sm:-mx-6 sm:px-6 sm:py-10">
       <div className="space-y-4">
         <div className="space-y-2">
-          <p className="font-mono text-[11px] tracking-[0.2em] text-violet-300/90 uppercase">
+          <p className="font-mono text-[11px] tracking-[0.2em] text-pokedex-bright/90 uppercase">
             Catalog · PC storage
           </p>
           <h1 className="font-mono text-xl tracking-wide text-zinc-100 sm:text-2xl">

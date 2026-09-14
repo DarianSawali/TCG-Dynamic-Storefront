@@ -30,11 +30,11 @@ export default async function CardDetailPage({ params }: Props) {
   return (
     <div className="space-y-8">
       <nav className="text-sm text-zinc-600 dark:text-zinc-400">
-        <Link href="/cards" className="hover:text-zinc-950 dark:hover:text-zinc-50">
+        <Link href="/cards" className="hover:text-pokedex-bright">
           Explore
         </Link>
         <span className="mx-2 text-zinc-400">/</span>
-        <span className="text-zinc-950 dark:text-zinc-50">
+        <span className="text-pokedex-cream">
           {card?.name ?? slug}
         </span>
       </nav>
@@ -56,12 +56,12 @@ export default async function CardDetailPage({ params }: Props) {
             className={
               card
                 ? `aspect-63/88 w-full max-w-xs rounded-xl bg-linear-to-br p-4 shadow-inner ${card.gradient}`
-                : "aspect-63/88 w-full max-w-xs rounded-xl border border-dashed border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900"
+                : "aspect-63/88 w-full max-w-xs rounded-xl border border-[#625253] bg-[#29282a]"
             }
           />
         )}
         <div className="space-y-4">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl dark:text-zinc-50">
+          <h1 className="text-2xl font-semibold tracking-tight text-pokedex-cream sm:text-3xl">
             {card?.name ?? slug.replace(/-/g, " ")}
           </h1>
           {card ? (
@@ -95,15 +95,15 @@ export default async function CardDetailPage({ params }: Props) {
           ) : null}
 
           <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
+            <div className="rounded-lg border border-[#625253] bg-[#1d1d1f] px-3 py-2">
               <dt className="text-zinc-500 dark:text-zinc-400">Slug</dt>
-              <dd className="font-mono text-zinc-950 dark:text-zinc-50">
+              <dd className="font-mono text-pokedex-cream">
                 {slug}
               </dd>
             </div>
-            <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
+            <div className="rounded-lg border border-[#625253] bg-[#1d1d1f] px-3 py-2">
               <dt className="text-zinc-500 dark:text-zinc-400">Market (NM)</dt>
-              <dd className="text-zinc-950 dark:text-zinc-50">
+              <dd className="text-pokedex-cream">
                 {card ? formatPrice(card.marketPriceCents) : "—"}
                 {card?.priceSource === "justtcg" ? (
                   <span className="mt-1 block text-xs font-normal text-zinc-500 dark:text-zinc-400">
@@ -113,31 +113,31 @@ export default async function CardDetailPage({ params }: Props) {
               </dd>
             </div>
             {card?.justtcgCardId ? (
-              <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
+              <div className="rounded-lg border border-[#625253] bg-[#1d1d1f] px-3 py-2">
                 <dt className="text-zinc-500 dark:text-zinc-400">JustTCG card ID</dt>
-                <dd className="break-all font-mono text-xs text-zinc-950 dark:text-zinc-50">
+                <dd className="break-all font-mono text-xs text-pokedex-cream">
                   {card.justtcgCardId}
                 </dd>
               </div>
             ) : null}
             {card?.tcgdexCardId ? (
-              <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
+              <div className="rounded-lg border border-[#625253] bg-[#1d1d1f] px-3 py-2">
                 <dt className="text-zinc-500 dark:text-zinc-400">TCGdex card ID</dt>
-                <dd className="break-all font-mono text-xs text-zinc-950 dark:text-zinc-50">
+                <dd className="break-all font-mono text-xs text-pokedex-cream">
                   {card.tcgdexCardId}
                 </dd>
               </div>
             ) : null}
-            <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
+            <div className="rounded-lg border border-[#625253] bg-[#1d1d1f] px-3 py-2">
               <dt className="text-zinc-500 dark:text-zinc-400">Stock</dt>
-              <dd className="text-zinc-950 dark:text-zinc-50">
+              <dd className="text-pokedex-cream">
                 {card?.stockLabel ?? "—"}
               </dd>
             </div>
             {card ? (
-              <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
+              <div className="rounded-lg border border-[#625253] bg-[#1d1d1f] px-3 py-2">
                 <dt className="text-zinc-500 dark:text-zinc-400">Shop</dt>
-                <dd className="text-zinc-950 dark:text-zinc-50">
+                <dd className="text-pokedex-cream">
                   {card.shopListed ? "Listed" : "Catalog only"}
                 </dd>
               </div>

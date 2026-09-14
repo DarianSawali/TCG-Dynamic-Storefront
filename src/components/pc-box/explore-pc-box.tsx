@@ -18,9 +18,10 @@ import {
 } from "@/lib/collector-number";
 
 const SLOT_COUNT = 24;
-/** Picked card : grid = 1 : 5 → detail is 1/6 of the row. */
-const DETAIL_FLEX = 1;
-const GRID_FLEX = 5;
+/** Initial desktop split; users can drag between the bounded ratios below. */
+const DEFAULT_DETAIL_RATIO = 0.34;
+const MIN_DETAIL_RATIO = 0.22;
+const MAX_DETAIL_RATIO = 0.62;
 const MIN_DETAIL_HEIGHT = 200;
 const MIN_GRID_HEIGHT = 180;
 
@@ -50,7 +51,7 @@ function DetailPanel({ card }: { card: CatalogCardWithPricing | null }) {
         {card.name}
       </h2>
 
-      <div className="relative mt-5 aspect-[5/7] w-full max-w-[10rem] overflow-hidden border border-dashed border-zinc-600 bg-zinc-950/60 lg:mt-6 lg:max-w-[11rem]">
+      <div className="relative mt-5 aspect-[5/7] w-full max-w-[10rem] overflow-hidden border border-[#625253] bg-[#29282a] lg:mt-6 lg:max-w-[11rem]">
         {card.imageUrl ? (
           <Image
             src={card.imageUrl}
@@ -80,7 +81,7 @@ function DetailPanel({ card }: { card: CatalogCardWithPricing | null }) {
 
       <Link
         href={`/cards/${card.slug}`}
-        className="mt-auto inline-flex w-full max-w-[12rem] items-center justify-center border border-zinc-500 bg-zinc-950 px-3 py-2.5 font-mono text-xs tracking-wide text-zinc-100 transition-colors hover:border-zinc-300 hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+        className="mt-auto inline-flex w-full max-w-[12rem] items-center justify-center border border-zinc-500 bg-zinc-950 px-3 py-2.5 font-mono text-xs tracking-wide text-zinc-100 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex"
       >
         [ VIEW CARD ]
       </Link>
@@ -113,12 +114,12 @@ function SlotCell({
       aria-pressed={selected}
       className={[
         "relative aspect-square overflow-hidden border transition-[border-color,background-color,box-shadow,transform] duration-150",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex",
         filled
-          ? "border-zinc-400 bg-zinc-900/80 hover:border-zinc-200"
-          : "border-zinc-700 bg-transparent hover:border-zinc-500",
+          ? "border-[#625253] bg-[#29282a] hover:border-pokedex/70"
+          : "border-[#4b4142] bg-[#171719] hover:border-[#625253]",
         selected
-          ? "scale-[1.03] border-violet-300 shadow-[0_0_0_1px_rgba(196,181,253,0.7),0_0_18px_-4px_rgba(167,139,250,0.55)]"
+          ? "scale-[1.03] border-pokedex-bright shadow-[0_0_0_1px_rgba(255,121,101,0.7),0_0_18px_-4px_rgba(223,90,72,0.55)]"
           : "",
       ].join(" ")}
     >
@@ -158,6 +159,7 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
   const [boxIndex, setBoxIndex] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState(0);
 
+  const [detailRatio, setDetailRatio] = useState(DEFAULT_DETAIL_RATIO);
   const [detailHeight, setDetailHeight] = useState(320);
   const [isLarge, setIsLarge] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -196,7 +198,6 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
   /** Vertical resize only on stacked (mobile) layout; desktop stays locked 1:5. */
   const onResizePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (isLarge) return;
       event.preventDefault();
       const body = bodyRef.current;
       if (!body) return;
@@ -206,12 +207,17 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
       setDragging(true);
 
       const onMove = (moveEvent: PointerEvent) => {
-        const maxDetail = Math.max(
-          MIN_DETAIL_HEIGHT,
-          rect.height - MIN_GRID_HEIGHT,
-        );
-        const next = moveEvent.clientY - rect.top;
-        setDetailHeight(clamp(next, MIN_DETAIL_HEIGHT, maxDetail));
+        if (isLarge) {
+          const next = (moveEvent.clientX - rect.left) / rect.width;
+          setDetailRatio(clamp(next, MIN_DETAIL_RATIO, MAX_DETAIL_RATIO));
+        } else {
+          const maxDetail = Math.max(
+            MIN_DETAIL_HEIGHT,
+            rect.height - MIN_GRID_HEIGHT,
+          );
+          const next = moveEvent.clientY - rect.top;
+          setDetailHeight(clamp(next, MIN_DETAIL_HEIGHT, maxDetail));
+        }
       };
 
       const onUp = () => {
@@ -230,7 +236,7 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
 
   if (ordered.length === 0) {
     return (
-      <section className="rounded-2xl border border-dashed border-zinc-600 bg-zinc-950 px-6 py-16 text-center font-mono text-sm text-zinc-500">
+      <section className="rounded-2xl border border-[#625253] bg-[#1d1d1f] px-6 py-16 text-center font-mono text-sm text-pokedex-muted">
         No cards in this box yet.
       </section>
     );
@@ -239,15 +245,15 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
   return (
     <section
       aria-label={`${boxTitle} PC box`}
-      className="overflow-hidden rounded-2xl border border-zinc-600 bg-zinc-950 text-zinc-100 shadow-[0_0_0_1px_rgba(63,63,70,0.8)]"
+      className="overflow-hidden rounded-2xl border border-[#625253] bg-[#1d1d1f] text-pokedex-cream shadow-[0_18px_50px_-30px_rgba(223,90,72,0.7)]"
     >
-      <header className="flex items-center justify-between gap-3 border-b border-dashed border-zinc-600 px-3 py-3 sm:px-4">
+      <header className="flex items-center justify-between gap-3 border-b border-[#625253] bg-pokedex-deep/45 px-3 py-3 sm:px-4">
         <button
           type="button"
           onClick={() => goToBox(safeBoxIndex - 1)}
           disabled={!canPage}
           aria-label="Previous box — see more cards"
-          className="flex size-9 shrink-0 items-center justify-center border border-zinc-600 font-mono text-sm text-zinc-300 transition-colors hover:border-zinc-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-zinc-600 disabled:hover:text-zinc-300"
+          className="flex size-9 shrink-0 items-center justify-center border border-zinc-600 font-mono text-sm text-zinc-300 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-zinc-600 disabled:hover:text-zinc-300"
         >
           ◀
         </button>
@@ -266,7 +272,7 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
           onClick={() => goToBox(safeBoxIndex + 1)}
           disabled={!canPage}
           aria-label="Next box — see more cards"
-          className="flex size-9 shrink-0 items-center justify-center border border-zinc-600 font-mono text-sm text-zinc-300 transition-colors hover:border-zinc-400 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-zinc-600 disabled:hover:text-zinc-300"
+          className="flex size-9 shrink-0 items-center justify-center border border-zinc-600 font-mono text-sm text-zinc-300 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-zinc-600 disabled:hover:text-zinc-300"
         >
           ▶
         </button>
@@ -285,10 +291,8 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
           style={
             isLarge
               ? {
-                  flexGrow: DETAIL_FLEX,
-                  flexShrink: 1,
-                  flexBasis: 0,
-                  height: "100%",
+                  width: `${detailRatio * 100}%`,
+                  flexShrink: 0,
                 }
               : { height: detailHeight, flexShrink: 0 }
           }
@@ -299,58 +303,62 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
         <div
           role="separator"
           aria-orientation={isLarge ? "vertical" : "horizontal"}
-          aria-valuemin={isLarge ? undefined : MIN_DETAIL_HEIGHT}
-          aria-valuemax={isLarge ? undefined : 600}
-          aria-valuenow={isLarge ? undefined : Math.round(detailHeight)}
-          aria-label={
-            isLarge
-              ? "Detail and grid split (1 to 5)"
-              : "Resize detail and grid panes"
+          aria-valuemin={isLarge ? MIN_DETAIL_RATIO * 100 : MIN_DETAIL_HEIGHT}
+          aria-valuemax={isLarge ? MAX_DETAIL_RATIO * 100 : 600}
+          aria-valuenow={
+            isLarge ? Math.round(detailRatio * 100) : Math.round(detailHeight)
           }
-          tabIndex={isLarge ? undefined : 0}
+          aria-label="Resize detail and grid panes"
+          tabIndex={0}
           onPointerDown={onResizePointerDown}
-          onKeyDown={
-            isLarge
-              ? undefined
-              : (event) => {
-                  if (event.key === "ArrowUp") {
-                    event.preventDefault();
-                    setDetailHeight((h) => Math.max(MIN_DETAIL_HEIGHT, h - 16));
-                  } else if (event.key === "ArrowDown") {
-                    event.preventDefault();
-                    setDetailHeight((h) => h + 16);
-                  }
-                }
-          }
+          onKeyDown={(event) => {
+            const ratioStep = event.shiftKey ? 0.04 : 0.02;
+            if (isLarge) {
+              if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                setDetailRatio((ratio) =>
+                  clamp(ratio - ratioStep, MIN_DETAIL_RATIO, MAX_DETAIL_RATIO),
+                );
+              } else if (event.key === "ArrowRight") {
+                event.preventDefault();
+                setDetailRatio((ratio) =>
+                  clamp(ratio + ratioStep, MIN_DETAIL_RATIO, MAX_DETAIL_RATIO),
+                );
+              }
+            } else if (event.key === "ArrowUp") {
+              event.preventDefault();
+              setDetailHeight((height) =>
+                Math.max(MIN_DETAIL_HEIGHT, height - 16),
+              );
+            } else if (event.key === "ArrowDown") {
+              event.preventDefault();
+              setDetailHeight((height) => height + 16);
+            }
+          }}
           className={[
-            "group relative z-10 flex shrink-0 items-center justify-center",
-            "border-dashed border-zinc-600 bg-zinc-950",
+            "group relative z-10 flex shrink-0 touch-none items-center justify-center border-[#625253] bg-[#181719] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-pokedex",
             isLarge
-              ? "w-3 cursor-default border-x"
-              : "h-3 cursor-row-resize touch-none border-y hover:bg-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-violet-400",
-            dragging ? "bg-zinc-900" : "",
+              ? "w-3 cursor-col-resize border-x hover:bg-[#29282a]"
+              : "h-3 cursor-row-resize border-y hover:bg-[#29282a]",
+            dragging ? "bg-[#29282a]" : "",
           ].join(" ")}
         >
           <span
             aria-hidden
             className={[
               "rounded-full bg-zinc-600",
-              isLarge ? "h-8 w-px bg-zinc-500" : "h-0.5 w-8 bg-zinc-500 group-hover:bg-violet-300 group-focus-visible:bg-violet-300",
-              dragging ? "bg-violet-300" : "",
+              isLarge ? "h-8 w-px bg-zinc-500" : "h-0.5 w-8 bg-zinc-500 group-hover:bg-pokedex-bright group-focus-visible:bg-pokedex-bright",
+              dragging ? "bg-pokedex-bright" : "",
             ].join(" ")}
           />
         </div>
 
         <div
           className="@container flex h-full min-h-0 min-w-0 flex-col p-4 sm:p-5"
-          style={
-            isLarge
-              ? { flexGrow: GRID_FLEX, flexShrink: 1, flexBasis: 0 }
-              : { flex: 1 }
-          }
+          style={{ flex: 1 }}
         >
           <div
-            className="grid flex-1 content-start grid-cols-3 gap-2 @min-[240px]:grid-cols-4 @min-[340px]:grid-cols-5 @min-[440px]:grid-cols-6 sm:gap-2.5"
+            className="grid flex-1 content-start grid-cols-2 gap-2 @min-[250px]:grid-cols-3 @min-[360px]:grid-cols-4 @min-[480px]:grid-cols-5 @min-[600px]:grid-cols-6 @min-[720px]:gap-3"
             role="listbox"
             aria-label={`Cards in ${boxTitle}, ordered by set number`}
           >

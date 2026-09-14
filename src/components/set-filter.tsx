@@ -17,7 +17,7 @@ export function SetFilter({ activeSetCode, activeLocale }: SetFilterProps) {
   return (
     <nav
       aria-label="Set boxes"
-      className="flex flex-wrap gap-2 border border-dashed border-zinc-600 bg-zinc-950/80 p-2"
+      className="flex flex-wrap gap-2 border border-[#625253] bg-[#1d1d1f] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
     >
       <Link href="/cards" className={tabClass(allActive)}>
         All sets
@@ -57,7 +57,7 @@ function tabClass(active: boolean): string {
   return [
     "inline-flex items-center border px-3 py-2 font-mono text-xs font-medium tracking-wide uppercase transition sm:text-sm",
     active
-      ? "border-violet-400/80 bg-violet-950/70 text-violet-100 shadow-[0_0_16px_-6px_rgba(167,139,250,0.65)]"
-      : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200",
+      ? "border-pokedex bg-pokedex-deep/80 text-pokedex-bright shadow-[0_0_16px_-7px_rgba(223,90,72,0.65)]"
+      : "border-[#625253] bg-[#29282a] text-pokedex-muted hover:border-pokedex/70 hover:text-pokedex-cream",
   ].join(" ");
 }

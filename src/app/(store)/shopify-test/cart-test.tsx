@@ -21,9 +21,9 @@ export function ShopifyCartTest({ variants }: { variants: ShopifyProductVariant[
   const availableVariants = variants.filter((variant) => variant.availableForSale);
 
   return (
-    <section className="space-y-4 rounded-xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-900 dark:bg-violet-950/30">
+    <section className="space-y-4 rounded-xl border border-pokedex/30 bg-pokedex/10 p-4 dark:border-pokedex/40 dark:bg-pokedex-deep/30">
       <div>
-        <h2 className="font-semibold text-zinc-950 dark:text-zinc-50">
+        <h2 className="font-semibold text-pokedex-cream">
           Persistent Shopify cart test
         </h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
@@ -38,7 +38,7 @@ export function ShopifyCartTest({ variants }: { variants: ShopifyProductVariant[
             <button
               type="submit"
               disabled={pending}
-              className="rounded-lg bg-violet-600 px-3 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:cursor-wait disabled:opacity-60"
+              className="rounded-lg bg-pokedex px-3 py-2 text-sm font-medium text-white hover:bg-pokedex-bright disabled:cursor-wait disabled:opacity-60"
             >
               {pending ? "Updating cart…" : `Add ${variant.title}`}
             </button>
@@ -53,7 +53,7 @@ export function ShopifyCartTest({ variants }: { variants: ShopifyProductVariant[
       ) : null}
 
       {state.status === "success" ? (
-        <div className="space-y-3 border-t border-violet-200 pt-4 dark:border-violet-900">
+        <div className="space-y-3 border-t border-pokedex/30 pt-4 dark:border-pokedex/40">
           <p className="text-sm text-zinc-700 dark:text-zinc-300">
             Shopify cart: {state.cart.totalQuantity} item
             {state.cart.totalQuantity === 1 ? "" : "s"}.
@@ -65,12 +65,12 @@ export function ShopifyCartTest({ variants }: { variants: ShopifyProductVariant[
               </li>
             ))}
           </ul>
-          <p className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+          <p className="text-lg font-semibold text-pokedex-cream">
             Subtotal: {formatMoney(state.cart.subtotal.amount, state.cart.subtotal.currencyCode)}
           </p>
           <a
             href={state.cart.checkoutUrl}
-            className="inline-flex rounded-lg bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
+            className="inline-flex rounded-lg border border-pokedex bg-pokedex px-4 py-2.5 text-sm font-medium text-white hover:border-pokedex-bright hover:bg-pokedex-bright"
           >
             Continue to Shopify checkout
           </a>

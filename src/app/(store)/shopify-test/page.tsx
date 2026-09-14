@@ -21,10 +21,10 @@ export default async function ShopifyTestPage() {
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-sm font-medium text-violet-600 dark:text-violet-400">
+        <p className="text-sm font-medium text-pokedex">
           Live from Shopify
         </p>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-pokedex-cream">
           {product.title}
         </h1>
         <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">
@@ -32,9 +32,9 @@ export default async function ShopifyTestPage() {
         </p>
       </header>
 
-      <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-          <h2 className="font-semibold text-zinc-950 dark:text-zinc-50">
+      <div className="rounded-xl border border-[#625253] bg-[#1d1d1f] shadow-sm">
+        <div className="flex items-center justify-between border-b border-[#625253] bg-pokedex-deep/35 px-4 py-3">
+          <h2 className="font-semibold text-pokedex-cream">
             Condition variants
           </h2>
           <span className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -48,14 +48,14 @@ export default async function ShopifyTestPage() {
               className="grid gap-2 px-4 py-4 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-6"
             >
               <div>
-                <p className="font-medium text-zinc-950 dark:text-zinc-50">
+                <p className="font-medium text-pokedex-cream">
                   {variant.title}
                 </p>
                 <p className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
                   {variant.sku ?? "No SKU"}
                 </p>
               </div>
-              <p className="font-semibold tabular-nums text-zinc-950 dark:text-zinc-50">
+              <p className="font-semibold tabular-nums text-pokedex-cream">
                 {formatMoney(variant.price)}
               </p>
               <p

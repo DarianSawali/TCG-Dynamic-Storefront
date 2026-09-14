@@ -6,10 +6,10 @@ export const metadata = {
 
 export default function PcBoxTestPage() {
   return (
-    <div className="-mx-4 min-h-[70vh] bg-zinc-900 px-4 py-8 sm:-mx-6 sm:px-6 sm:py-10">
+    <div className="-mx-4 min-h-[70vh] bg-[#101011] px-4 py-8 sm:-mx-6 sm:px-6 sm:py-10">
       <div className="mx-auto max-w-5xl space-y-6">
         <header className="space-y-2">
-          <p className="font-mono text-[11px] tracking-[0.2em] text-violet-300/90 uppercase">
+          <p className="font-mono text-[11px] tracking-[0.2em] text-pokedex-bright/90 uppercase">
             Layout prototype · not live
           </p>
           <h1 className="font-mono text-lg tracking-wide text-zinc-100 sm:text-xl">
