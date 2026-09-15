@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { ShopifyListingDraft } from "@/lib/shopify/listing-draft";
+
 const SHOPIFY_ADMIN_API_VERSION = "2026-07";
 const TOKEN_REFRESH_BUFFER_MS = 60_000;
 
@@ -204,6 +206,148 @@ export async function getShopifyAdminProducts(): Promise<ShopifyAdminProduct[]> 
   } while (after);
 
   return products;
+}
+
+export type CreatedShopifyDraft = {
+  id: string;
+  handle: string;
+  status: ShopifyAdminProductStatus;
+  variants: Array<{ id: string; title: string; sku: string | null }>;
+};
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+/** Creates or idempotently replaces one unpublished draft identified by handle. */
+export async function createShopifyDraftProduct(
+  draft: ShopifyListingDraft,
+): Promise<CreatedShopifyDraft> {
+  if (draft.status !== "DRAFT" || draft.publishToHeadless) {
+    throw new Error("Only unpublished draft products can be created here.");
+  }
+  if (!/^[a-z0-9][a-z0-9-]{0,254}$/.test(draft.handle)) {
+    throw new Error("Invalid Shopify product handle.");
+  }
+  if (
+    draft.variants.length !== 5 ||
+    draft.variants.some(
+      (variant) =>
+        variant.price == null ||
+        !/^\d+(\.\d{2})$/.test(variant.price) ||
+        !/^PKM-[A-Z0-9]+-[A-Z0-9.]+-(EN|JA)-(NM|LP|MP|HP|DMG)$/.test(
+          variant.sku,
+        ),
+    )
+  ) {
+    throw new Error("The listing draft has invalid variants, prices, or SKUs.");
+  }
+
+  const data = await adminQuery<{
+    productSet: {
+      product:
+        | (Omit<CreatedShopifyDraft, "variants"> & {
+            variants: { nodes: CreatedShopifyDraft["variants"] };
+          })
+        | null;
+      userErrors: Array<{
+        code: string | null;
+        field: string[] | null;
+        message: string;
+      }>;
+    };
+  }>(/* GraphQL */ `
+    mutation CreateUnpublishedCardDraft(
+      $identifier: ProductSetIdentifiers!
+      $input: ProductSetInput!
+    ) {
+      productSet(identifier: $identifier, input: $input, synchronous: true) {
+        product {
+          id
+          handle
+          status
+          variants(first: 100) {
+            nodes { id title sku }
+          }
+        }
+        userErrors { code field message }
+      }
+    }
+  `, {
+    identifier: { handle: draft.handle },
+    input: {
+      title: draft.title,
+      handle: draft.handle,
+      descriptionHtml: `<p>${escapeHtml(draft.description)}</p>`,
+      status: "DRAFT",
+      productType: "Single Trading Card",
+      vendor: "PokeCell TCG",
+      tags: ["pokemon-tcg", "single-card"],
+      productOptions: [
+        {
+          name: draft.optionName,
+          position: 1,
+          values: draft.variants.map((variant) => ({ name: variant.title })),
+        },
+      ],
+      files: draft.imageUrl
+        ? [
+            {
+              originalSource: draft.imageUrl,
+              alt: draft.title,
+              contentType: "IMAGE",
+            },
+          ]
+        : [],
+      variants: draft.variants.map((variant, index) => ({
+        optionValues: [
+          { optionName: draft.optionName, name: variant.title },
+        ],
+        position: index + 1,
+        price: variant.price,
+        sku: variant.sku,
+        inventoryItem: {
+          sku: variant.sku,
+          tracked: draft.trackQuantity,
+          requiresShipping: draft.requiresShipping,
+        },
+        inventoryPolicy: draft.continueSellingWhenOutOfStock
+          ? "CONTINUE"
+          : "DENY",
+        published: false,
+        taxable: true,
+      })),
+    },
+  });
+
+  const result = data.productSet;
+  if (result.userErrors.length) {
+    throw new Error(
+      `Shopify rejected the product draft: ${result.userErrors
+        .map((error) => error.message)
+        .join("; ")}`,
+    );
+  }
+  if (!result.product) {
+    throw new Error("Shopify did not return the created product draft.");
+  }
+  const product: CreatedShopifyDraft = {
+    ...result.product,
+    variants: result.product.variants.nodes,
+  };
+  if (
+    product.status !== "DRAFT" ||
+    product.variants.length !== draft.variants.length
+  ) {
+    throw new Error("Shopify returned an incomplete or non-draft product.");
+  }
+
+  return product;
 }
 
 export async function getShopifyAdminStatus(): Promise<ShopifyAdminStatus> {

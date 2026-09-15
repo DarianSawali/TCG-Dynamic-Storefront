@@ -33,6 +33,7 @@ type PageProps = {
     q?: string | string[];
     set?: string | string[];
     status?: string | string[];
+    created?: string | string[];
   }>;
 };
 
@@ -83,19 +84,19 @@ function evaluateRow(
   const headless = headlessProductIds.has(product.id);
   const missingSkus = product.variants.filter((variant) => !variant.sku).length;
 
-  if (!card.shopListed) {
-    return {
-      state: "attention",
-      stateLabel: "Catalog mismatch",
-      detail: "A Shopify product exists, but the catalog listing flag is off.",
-      headless,
-    };
-  }
   if (product.status !== "ACTIVE") {
     return {
       state: "attention",
       stateLabel: `Shopify ${product.status.toLowerCase()}`,
       detail: "The matched Shopify product is not active.",
+      headless,
+    };
+  }
+  if (!card.shopListed) {
+    return {
+      state: "attention",
+      stateLabel: "Catalog mismatch",
+      detail: "An active Shopify product exists, but the catalog listing flag is off.",
       headless,
     };
   }
@@ -177,6 +178,7 @@ export default async function AdminListingsPage({ searchParams }: PageProps) {
   const query = one(params.q).trim();
   const setCode = one(params.set);
   const requestedState = one(params.status);
+  const createdHandle = one(params.created);
   const stateFilter: ListingState | "all" =
     requestedState === "connected" ||
     requestedState === "attention" ||
@@ -247,6 +249,13 @@ export default async function AdminListingsPage({ searchParams }: PageProps) {
           </span>
         </div>
       </div>
+
+      {createdHandle ? (
+        <section className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
+          Shopify draft <span className="font-mono">{createdHandle}</span> was
+          created and linked. It remains unpublished with zero inventory.
+        </section>
+      ) : null}
 
       {catalogResult.status === "rejected" ||
       adminProductsResult.status === "rejected" ||

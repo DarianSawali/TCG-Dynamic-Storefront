@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CreateListingForm } from "@/app/admin/(protected)/listings/new/create-listing-form";
 import { AdminNav } from "@/components/admin-nav";
 import { getCatalogCards } from "@/data/catalog";
 import { findCatalogCardForShopifyProduct } from "@/lib/pricing/shopify-match";
@@ -54,21 +55,28 @@ export default async function NewListingPreviewPage({ searchParams }: PageProps)
             ← Back to listings
           </Link>
           <h1 className="mt-2 text-xl font-semibold text-zinc-950 dark:text-zinc-50">
-            Review listing draft
+            {existingProducts.length > 0 ? "Shopify draft created" : "Review listing draft"}
           </h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Preview only. Nothing on this page can create or modify a Shopify product.
+            {existingProducts.length > 0
+              ? "This catalog card already has a matching Shopify product. Creation is disabled to prevent duplicates."
+              : "Review every proposed field before explicitly creating an unpublished Shopify draft."}
           </p>
         </div>
-        <span className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
-          No Shopify writes
+        <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+          existingProducts.length > 0
+            ? "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+            : "border-blue-300 bg-blue-50 text-blue-800 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300"
+        }`}>
+          {existingProducts.length > 0 ? "Existing Shopify draft" : "Confirmation required"}
         </span>
       </div>
 
       {existingProducts.length > 0 ? (
-        <section className="rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-900 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">
-          Creation is blocked because {existingProducts.length} existing Shopify
-          product{existingProducts.length === 1 ? " already matches" : "s already match"} this card.
+        <section className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
+          Duplicate protection is active: {existingProducts.length} Shopify
+          product{existingProducts.length === 1 ? " already matches" : "s already match"} this card,
+          so another cannot be created.
         </section>
       ) : null}
 
@@ -179,10 +187,14 @@ export default async function NewListingPreviewPage({ searchParams }: PageProps)
       </section>
 
       <section className="rounded-xl border border-dashed border-zinc-300 p-5 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-        {blocked
-          ? "Resolve the blockers above before creation can be enabled."
-          : "Draft is eligible. The next stage will add an explicit confirmation step that creates this as an unpublished Shopify draft."}
+        {existingProducts.length > 0
+          ? "The existing Shopify draft remains unpublished with zero inventory. Return to Listings to continue managing it."
+          : draft.blockers.length > 0
+            ? "Resolve the blockers above before creation can be enabled."
+            : "Draft is eligible. Creating it will not publish it or add sellable inventory."}
       </section>
+
+      {!blocked ? <CreateListingForm slug={card.slug} title={card.name} /> : null}
     </div>
   );
 }

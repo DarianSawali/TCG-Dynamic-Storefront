@@ -14,6 +14,7 @@
     "shopify:check": "tsx scripts/check-shopify.ts",
     "shopify:check-product": "tsx scripts/check-shopify-product.ts",
     "shopify:check-admin": "tsx scripts/check-shopify-admin.ts",
+    "shopify:check-listing-schema": "node --conditions=react-server --import tsx scripts/check-shopify-listing-schema.ts",
     "pricing:check-policy": "tsx scripts/check-pricing-policy.ts",
     "pricing:check-observations": "tsx scripts/check-price-observations.ts",
     "pricing:sync-catalog": "tsx scripts/sync-justtcg-catalog-prices.ts",
