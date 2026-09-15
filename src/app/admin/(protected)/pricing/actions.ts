@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth/session";
-import { getCatalogCards } from "@/data/catalog";
+import { getLiveShopCards } from "@/data/catalog";
 import {
   conditionFromShopifyVariantTitle,
   findCatalogCardForShopifyProduct,
@@ -34,7 +34,7 @@ export async function approveMarketPricesAction(
   try {
     const [product, cards] = await Promise.all([
       getShopifyProductByHandle(handle),
-      getCatalogCards(),
+      getLiveShopCards(),
     ]);
     if (!product) {
       return { status: "error", message: "The Shopify product was not found." };

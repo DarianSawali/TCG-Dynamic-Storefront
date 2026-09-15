@@ -75,7 +75,10 @@ function DetailPanel({ card }: { card: CatalogCardWithPricing | null }) {
         </p>
         {card.rarity ? <p className="text-zinc-300">{card.rarity}</p> : null}
         <p className="pt-1 text-sm text-zinc-100">
-          NM {formatPrice(card.marketPriceCents)}
+          NM market {formatPrice(card.marketPriceCents)}
+        </p>
+        <p className="text-[10px] text-zinc-500">
+          {card.priceSource === "justtcg" ? "Synced · JustTCG" : "Price unavailable"}
         </p>
       </div>
 

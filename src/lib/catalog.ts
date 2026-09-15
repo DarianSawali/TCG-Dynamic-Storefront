@@ -101,6 +101,8 @@ export const mockCards: CatalogCard[] = [
     nmCents: 6299,
     stockLabel: "Low Stock",
     shopListed: true,
+    justtcgCardId:
+      "pokemon-sv-scarlet-violet-151-mew-ex-193-165-ultra-rare",
     tcgdexCardId: "sv03.5-193",
   }),
   mockCard({
@@ -176,6 +178,8 @@ export const mockCards: CatalogCard[] = [
     nmCents: 8999,
     stockLabel: "Low Stock",
     shopListed: true,
+    justtcgCardId:
+      "pokemon-me02-phantasmal-flames-mega-charizard-x-ex-013-094-double-rare",
     tcgdexCardId: "me02-013",
   }),
   mockCard({
@@ -195,6 +199,8 @@ export const mockCards: CatalogCard[] = [
     nmCents: 5499,
     stockLabel: "In Stock",
     shopListed: true,
+    justtcgCardId:
+      "pokemon-me02-phantasmal-flames-mega-gengar-ex-double-rare",
     tcgdexCardId: "me02-056",
   }),
   mockCard({
@@ -254,6 +260,8 @@ export const mockCards: CatalogCard[] = [
     nmCents: 12999,
     stockLabel: "Low Stock",
     shopListed: true,
+    justtcgCardId:
+      "pokemon-me-ascended-heroes-mega-gengar-ex-125-217-double-rare",
     tcgdexCardId: "me02.5-125",
   }),
   mockCard({
@@ -273,6 +281,8 @@ export const mockCards: CatalogCard[] = [
     nmCents: 3799,
     stockLabel: "In Stock",
     shopListed: true,
+    justtcgCardId:
+      "pokemon-me-ascended-heroes-mega-gardevoir-ex-double-rare",
     tcgdexCardId: "me02.5-089",
   }),
   mockCard({

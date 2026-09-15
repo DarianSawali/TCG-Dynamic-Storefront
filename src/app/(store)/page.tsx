@@ -17,7 +17,7 @@ export default function HomePage() {
 
       <section className="mt-10 space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Sets in scope
+          Sets in store
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {getVisibleStoreSets().map((set) => {

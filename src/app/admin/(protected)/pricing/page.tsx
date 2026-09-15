@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ApprovePricesForm } from "@/app/admin/(protected)/pricing/approve-prices-form";
 import { AdminNav } from "@/components/admin-nav";
-import { getCatalogCards } from "@/data/catalog";
+import { getLiveShopCards } from "@/data/catalog";
 import {
   evaluatePriceChange,
   previousLargeDecreaseAt,
@@ -43,7 +43,7 @@ function money(value: number | null, currency = "USD"): string {
 export default async function AdminPricingPage() {
   const [shopifyResult, catalogResult, adminResult] = await Promise.allSettled([
     getShopifyProducts(),
-    getCatalogCards(),
+    getLiveShopCards(),
     getShopifyAdminStatus(),
   ]);
   const products = shopifyResult.status === "fulfilled" ? shopifyResult.value : [];

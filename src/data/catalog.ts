@@ -35,10 +35,11 @@ function applyFilters(
   });
 }
 
-/** One pass of JustTCG + TCGdex per request (deduped across RSC reads). */
-export const getCatalogCards = cache(
-  async (filters?: CatalogFilters): Promise<CatalogCardWithPricing[]> => {
+/** Loads the database-backed catalog once per server render. */
+const getCatalogSource = cache(
+  async () => {
     let source = filterVisibleCards(mockCards);
+    let fromDatabase = false;
     try {
       const visibleCodes = getVisibleStoreSetCodes();
       const dbRows = await db.card.findMany({
@@ -54,6 +55,7 @@ export const getCatalogCards = cache(
         orderBy: [{ setCode: "asc" }, { locale: "asc" }, { createdAt: "asc" }],
       });
       if (dbRows.length > 0) {
+        fromDatabase = true;
         source = dbRows.map((row) => {
           const fallback = mockCards.find((card) => card.slug === row.slug);
           const nmCents = row.listing?.marketPriceCents ?? null;
@@ -91,11 +93,42 @@ export const getCatalogCards = cache(
       // Fallback to static mock rows until Prisma migration/seed is ready.
     }
 
-    const priced = await mergeJustTcgPrices(source);
+    return { cards: source, fromDatabase };
+  },
+);
+
+function useSyncedPrices(
+  source: Awaited<ReturnType<typeof getCatalogSource>>,
+): CatalogCardWithPricing[] {
+  return source.cards.map((card) => {
+    const hasSyncedNm = Boolean(
+      source.fromDatabase && card.justtcgCardId && card.marketPriceCents != null,
+    );
+    return {
+      ...card,
+      priceSource: hasSyncedNm ? "justtcg" : "mock",
+      livePriceConditions: hasSyncedNm ? ["NM"] : [],
+      imageUrl: null,
+    };
+  });
+}
+
+/** Storefront reads the latest sync without spending API quota per visit. */
+export const getCatalogCards = cache(
+  async (filters?: CatalogFilters): Promise<CatalogCardWithPricing[]> => {
+    const priced = useSyncedPrices(await getCatalogSource());
     const withImages = await enrichTcgdexImages(priced);
     return applyFilters(withImages, filters);
   },
 );
+
+/** Admin repricing refreshes only products that are actually listed for sale. */
+export const getLiveShopCards = cache(async (): Promise<CatalogCardWithPricing[]> => {
+  const source = await getCatalogSource();
+  const listed = source.cards.filter((card) => card.shopListed);
+  const priced = await mergeJustTcgPrices(listed);
+  return enrichTcgdexImages(priced);
+});
 
 function toStockLabel(stockStatus: StockStatus | undefined): StockLabel {
   switch (stockStatus) {

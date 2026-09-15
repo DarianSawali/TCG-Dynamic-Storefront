@@ -2,6 +2,7 @@ import "server-only";
 
 import type { Card } from "justtcg-js";
 import { JustTCG } from "justtcg-js";
+import { unstable_cache } from "next/cache";
 import type { CatalogCard, CatalogCardWithPricing } from "@/lib/catalog";
 import {
   CARD_CONDITIONS,
@@ -13,6 +14,7 @@ import {
 } from "@/lib/conditions";
 
 const FREE_PLAN_BATCH_MAX = 20;
+const PRICE_CACHE_SECONDS = 600;
 
 function dollarsToCents(value: number): number {
   return Math.round(value * 100);
@@ -49,6 +51,41 @@ function buildPriceMapFromResponse(
   return map;
 }
 
+const fetchPriceEntries = unstable_cache(
+  async (
+    lookupIds: string[],
+  ): Promise<Array<[string, Partial<Record<CardCondition, number>>]>> => {
+    const apiKey = process.env.JUSTTCG_API_KEY?.trim();
+    if (!apiKey) throw new Error("JUSTTCG_API_KEY is not configured.");
+    const priceByCardId = new Map<
+      string,
+      Partial<Record<CardCondition, number>>
+    >();
+    const client = new JustTCG({ apiKey });
+
+    for (let i = 0; i < lookupIds.length; i += FREE_PLAN_BATCH_MAX) {
+      const slice = lookupIds.slice(i, i + FREE_PLAN_BATCH_MAX);
+      const response = await client.v1.cards.getByBatch(
+        slice.map((cardId) => ({
+          cardId,
+          condition: [...CARD_CONDITIONS],
+        })),
+      );
+
+      if (response.error) {
+        throw new Error(`${response.code ?? "JustTCG"}: ${response.error}`);
+      }
+
+      const merged = buildPriceMapFromResponse(response.data);
+      for (const [id, cents] of merged) priceByCardId.set(id, cents);
+    }
+
+    return [...priceByCardId.entries()];
+  },
+  ["justtcg-catalog-prices-v1"],
+  { revalidate: PRICE_CACHE_SECONDS },
+);
+
 function mergeConditionPrices(
   card: CatalogCard,
   justTcgByCondition?: Partial<Record<CardCondition, number>>,
@@ -84,51 +121,34 @@ export async function mergeJustTcgPrices(
 
   if (!lookupIds.length) return withMockOnly();
 
-  const priceByCardId = new Map<string, Partial<Record<CardCondition, number>>>();
-
   try {
-    const client = new JustTCG({ apiKey });
-    for (let i = 0; i < lookupIds.length; i += FREE_PLAN_BATCH_MAX) {
-      const slice = lookupIds.slice(i, i + FREE_PLAN_BATCH_MAX);
-      const items = slice.map((cardId) => ({
-        cardId,
-        condition: [...CARD_CONDITIONS],
-      }));
+    const priceByCardId = new Map(
+      await fetchPriceEntries(lookupIds),
+    );
 
-      const response = await client.v1.cards.getByBatch(items);
-
-      if (response.error) {
-        console.warn("[JustTCG]", response.code ?? "", response.error);
-        return withMockOnly();
+    return cards.map((card) => {
+      if (!card.justtcgCardId) {
+        return { ...card, priceSource: "mock" as const, livePriceConditions: [], imageUrl: null };
+      }
+      const live = priceByCardId.get(card.justtcgCardId);
+      if (!live || Object.keys(live).length === 0) {
+        return { ...card, priceSource: "mock" as const, livePriceConditions: [], imageUrl: null };
       }
 
-      const merged = buildPriceMapFromResponse(response.data);
-      for (const [id, cents] of merged) priceByCardId.set(id, cents);
-    }
+      const conditionPrices = mergeConditionPrices(card, live);
+      return {
+        ...card,
+        conditionPrices,
+        marketPriceCents: nmPrice(conditionPrices),
+        priceSource: "justtcg" as const,
+        livePriceConditions: CARD_CONDITIONS.filter(
+          (condition) => live[condition] != null,
+        ),
+        imageUrl: null,
+      };
+    });
   } catch (err) {
     console.warn("[JustTCG] request failed:", err);
     return withMockOnly();
   }
-
-  return cards.map((card) => {
-    if (!card.justtcgCardId) {
-      return { ...card, priceSource: "mock" as const, livePriceConditions: [], imageUrl: null };
-    }
-    const live = priceByCardId.get(card.justtcgCardId);
-    if (!live || Object.keys(live).length === 0) {
-      return { ...card, priceSource: "mock" as const, livePriceConditions: [], imageUrl: null };
-    }
-
-    const conditionPrices = mergeConditionPrices(card, live);
-    return {
-      ...card,
-      conditionPrices,
-      marketPriceCents: nmPrice(conditionPrices),
-      priceSource: "justtcg" as const,
-      livePriceConditions: CARD_CONDITIONS.filter(
-        (condition) => live[condition] != null,
-      ),
-      imageUrl: null,
-    };
-  });
 }

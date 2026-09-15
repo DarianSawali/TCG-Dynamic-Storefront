@@ -16,6 +16,7 @@
     "shopify:check-admin": "tsx scripts/check-shopify-admin.ts",
     "pricing:check-policy": "tsx scripts/check-pricing-policy.ts",
     "pricing:check-observations": "tsx scripts/check-price-observations.ts",
+    "pricing:sync-catalog": "tsx scripts/sync-justtcg-catalog-prices.ts",
     "pricing:observe": "node --conditions=react-server --import tsx scripts/record-price-observations.ts",
     "admin:create": "tsx scripts/create-admin.ts",
     "db:setup": "prisma migrate deploy && prisma db seed",
