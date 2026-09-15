@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   useCallback,
   useEffect,
@@ -66,12 +67,12 @@ function DetailPanel({ card }: { card: PcBoxCard | null }) {
         <p className="pt-1 text-sm text-zinc-100">{card.price}</p>
       </div>
 
-      <button
-        type="button"
+      <Link
+        href="/shop"
         className="mt-auto w-full max-w-[14rem] border border-zinc-500 bg-zinc-950 px-3 py-2.5 font-mono text-xs tracking-wide text-zinc-100 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex"
       >
-        [ ADD TO CART ]
-      </button>
+        [ VIEW SHOP ]
+      </Link>
     </div>
   );
 }

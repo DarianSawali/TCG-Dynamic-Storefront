@@ -29,7 +29,7 @@ export default function HomePage() {
               <li key={`${set.code}-${set.locale}`}>
                 <Link
                   href={href}
-                  className="set-scope-card group relative flex min-h-32 flex-col overflow-hidden rounded-xl border border-[#625253] bg-[#1d1d1f] p-4 shadow-sm transition-[transform,border-color,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:border-pokedex-bright hover:shadow-[0_18px_36px_-22px_rgba(223,90,72,0.9)] focus-visible:border-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex motion-reduce:transform-none motion-reduce:transition-colors"
+                  className="set-scope-card group relative flex min-h-32 flex-col overflow-hidden rounded-xl border border-[#74443f] bg-[linear-gradient(135deg,#211b1b_0%,#1d1d1f_58%,#251716_100%)] p-4 shadow-[inset_3px_0_0_#df5a48,0_10px_28px_-24px_rgba(223,90,72,0.75)] transition-[transform,border-color,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:border-pokedex-bright hover:shadow-[inset_3px_0_0_#ff7965,0_18px_36px_-18px_rgba(223,90,72,0.9)] focus-visible:border-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex motion-reduce:transform-none motion-reduce:transition-colors"
                 >
                   <span className="relative z-10 flex items-start justify-between gap-2">
                     <span className="font-medium text-pokedex-cream transition-colors duration-300 group-hover:text-white group-focus-visible:text-white">

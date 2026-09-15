@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCart } from "@/components/cart/cart-provider";
 
 const navLinkClass =
   "inline-flex items-center border border-transparent px-2.5 py-2 font-mono text-[11px] font-medium tracking-wide text-pokedex-muted uppercase transition-[color,border-color,background-color,transform] hover:border-pokedex-muted/60 hover:bg-white/5 hover:text-pokedex-cream active:scale-[0.96] motion-reduce:transition-colors motion-reduce:active:scale-100";
 
 const cartLinkClass =
-  "group relative flex size-9 shrink-0 items-center justify-center border border-pokedex-muted/50 bg-[#29282a] text-pokedex-cream transition-[color,transform,border-color,background-color] duration-200 ease-out hover:border-pokedex hover:bg-pokedex/10 hover:text-pokedex-bright active:scale-[0.92] motion-reduce:transition-colors motion-reduce:active:scale-100";
+  "group relative flex size-9 shrink-0 items-center justify-center text-pokedex-cream transition-[color,transform] duration-200 ease-out hover:text-pokedex-bright active:scale-[0.92] motion-reduce:transition-colors motion-reduce:active:scale-100";
 
 function CartIcon({ className }: { className?: string }) {
   return (
@@ -35,7 +34,6 @@ const mainNav = [
 ] as const;
 
 export function SiteHeader({ shopifyItemCount }: { shopifyItemCount: number }) {
-  const { itemCount } = useCart();
   const pathname = usePathname();
 
   return (
@@ -72,11 +70,6 @@ export function SiteHeader({ shopifyItemCount }: { shopifyItemCount: number }) {
               </Link>
             );
           })}
-          <Link href="/cart" className={`${navLinkClass} hidden md:inline-flex`}>
-            <span>
-              Legacy cart{itemCount > 0 ? ` (${itemCount})` : ""}
-            </span>
-          </Link>
           <Link
             href="/shopify-cart"
             aria-label={`Shopify cart with ${shopifyItemCount} items`}

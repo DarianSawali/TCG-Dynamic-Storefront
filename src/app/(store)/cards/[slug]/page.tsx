@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ConditionBuyPanel } from "@/components/condition-buy-panel";
 import { ConditionPriceTable } from "@/components/condition-price-table";
 import { getCardBySlug } from "@/data/catalog";
 import { formatPrice } from "@/lib/catalog";
@@ -80,7 +79,14 @@ export default async function CardDetailPage({ params }: Props) {
               come from your database and TCGdex when connected.
             </p>
           )}
-          {card?.shopListed ? <ConditionBuyPanel card={card} /> : null}
+          {card?.shopListed ? (
+            <Link
+              href="/shop"
+              className="inline-flex items-center justify-center rounded-lg bg-pokedex px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex"
+            >
+              View live Shopify inventory
+            </Link>
+          ) : null}
 
           {card ? (
             <section className="space-y-3">

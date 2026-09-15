@@ -53,26 +53,27 @@ body {
   position: absolute;
   z-index: 0;
   left: -12%;
-  bottom: -145%;
+  top: -10%;
   width: 124%;
-  height: 150%;
-  border-radius: 48% 52% 0 0 / 15% 18% 0 0;
+  height: 125%;
+  border-radius: 48% 52% 0 0 / 13% 17% 0 0;
   background:
     radial-gradient(circle at 72% 9%, rgb(255 255 255 / 14%) 0 3%, transparent 3.5%),
     radial-gradient(circle at 28% 13%, rgb(255 255 255 / 10%) 0 2%, transparent 2.5%),
-    linear-gradient(160deg, var(--color-pokedex-bright), var(--color-pokedex) 38%, #b63d31 100%);
-  transform: rotate(-1.5deg);
+    linear-gradient(160deg, #ff7965, #df5a48 38%, #b63d31 100%);
+  transform: translateY(96%) rotate(-1.5deg);
   transition:
-    bottom 650ms cubic-bezier(0.2, 0.78, 0.2, 1),
+    transform 650ms cubic-bezier(0.2, 0.78, 0.2, 1),
     border-radius 650ms ease,
-    transform 650ms ease;
+    filter 650ms ease;
+  will-change: transform;
 }
 
 .set-scope-card:hover::before,
 .set-scope-card:focus-visible::before {
-  bottom: -12%;
   border-radius: 44% 56% 0 0 / 7% 9% 0 0;
-  transform: rotate(0deg);
+  filter: saturate(1.08);
+  transform: translateY(-8%) rotate(0deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
