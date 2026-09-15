@@ -38,7 +38,7 @@ export function ConditionPriceTable({
                   <span className="font-medium text-pokedex-cream">
                     {row.label}
                   </span>
-                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-0.5 hidden text-xs text-zinc-500 sm:block dark:text-zinc-400">
                     {row.description}
                   </p>
                 </td>

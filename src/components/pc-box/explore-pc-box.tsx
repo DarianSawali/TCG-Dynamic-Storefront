@@ -22,7 +22,7 @@ const SLOT_COUNT = 24;
 const DEFAULT_DETAIL_RATIO = 0.34;
 const MIN_DETAIL_RATIO = 0.22;
 const MAX_DETAIL_RATIO = 0.62;
-const MIN_DETAIL_HEIGHT = 200;
+const MIN_DETAIL_HEIGHT = 280;
 const MIN_GRID_HEIGHT = 180;
 
 function clamp(value: number, min: number, max: number) {
@@ -46,48 +46,52 @@ function DetailPanel({ card }: { card: CatalogCardWithPricing | null }) {
   }
 
   return (
-    <div className="flex h-full min-h-48 flex-col items-center px-4 py-5 sm:px-6 lg:py-8">
+    <div className="flex h-full min-h-48 flex-col px-4 py-4 sm:px-6 sm:py-5 lg:items-center lg:py-8">
       <h2 className="text-center font-mono text-sm font-medium tracking-wide text-zinc-100 sm:text-base">
         {card.name}
       </h2>
 
-      <div className="relative mt-5 aspect-[5/7] w-full max-w-[10rem] overflow-hidden border border-[#625253] bg-[#29282a] lg:mt-6 lg:max-w-[11rem]">
-        {card.imageUrl ? (
-          <Image
-            src={card.imageUrl}
-            alt={card.name}
-            fill
-            className="object-contain p-1"
-            sizes="176px"
-          />
-        ) : (
-          <div
-            className={`flex h-full w-full items-center justify-center bg-linear-to-br font-mono text-[10px] tracking-widest text-white/50 uppercase ${card.gradient}`}
-          >
-            #{card.collectorNumber}
+      <div className="mt-4 flex min-h-0 w-full flex-1 flex-col items-center justify-center sm:flex-row sm:gap-6 lg:flex-col lg:justify-start lg:gap-0">
+        <div className="relative aspect-[5/7] w-full max-w-28 shrink-0 overflow-hidden border border-[#625253] bg-[#29282a] sm:max-w-32 md:max-w-36 lg:mt-2 lg:max-w-[11rem]">
+          {card.imageUrl ? (
+            <Image
+              src={card.imageUrl}
+              alt={card.name}
+              fill
+              className="object-contain p-1"
+              sizes="176px"
+            />
+          ) : (
+            <div
+              className={`flex h-full w-full items-center justify-center bg-linear-to-br font-mono text-[10px] tracking-widest text-white/50 uppercase ${card.gradient}`}
+            >
+              #{card.collectorNumber}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-3 flex min-w-0 flex-col items-center text-center sm:mt-0 lg:mt-5 lg:w-full">
+          <div className="space-y-1 font-mono text-[11px] text-zinc-400 sm:text-xs">
+            <p className="break-words">
+              {card.setName} · #{card.collectorNumber}
+            </p>
+            {card.rarity ? <p className="text-zinc-300">{card.rarity}</p> : null}
+            <p className="pt-1 text-sm text-zinc-100">
+              NM market {formatPrice(card.marketPriceCents)}
+            </p>
+            <p className="text-[10px] text-zinc-500">
+              {card.priceSource === "justtcg" ? "Synced · JustTCG" : "Price unavailable"}
+            </p>
           </div>
-        )}
-      </div>
 
-      <div className="mt-5 space-y-1 text-center font-mono text-xs text-zinc-400 lg:mt-6">
-        <p>
-          {card.setName} · #{card.collectorNumber}
-        </p>
-        {card.rarity ? <p className="text-zinc-300">{card.rarity}</p> : null}
-        <p className="pt-1 text-sm text-zinc-100">
-          NM market {formatPrice(card.marketPriceCents)}
-        </p>
-        <p className="text-[10px] text-zinc-500">
-          {card.priceSource === "justtcg" ? "Synced · JustTCG" : "Price unavailable"}
-        </p>
+          <Link
+            href={`/cards/${card.slug}`}
+            className="mt-4 inline-flex w-full max-w-[12rem] items-center justify-center border border-zinc-500 bg-zinc-950 px-3 py-2.5 font-mono text-[11px] tracking-wide text-zinc-100 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex sm:text-xs lg:mt-6"
+          >
+            [ VIEW CARD ]
+          </Link>
+        </div>
       </div>
-
-      <Link
-        href={`/cards/${card.slug}`}
-        className="mt-auto inline-flex w-full max-w-[12rem] items-center justify-center border border-zinc-500 bg-zinc-950 px-3 py-2.5 font-mono text-xs tracking-wide text-zinc-100 transition-colors hover:border-pokedex hover:text-pokedex-bright focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pokedex"
-      >
-        [ VIEW CARD ]
-      </Link>
     </div>
   );
 }
@@ -163,7 +167,7 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
   const [selectedSlot, setSelectedSlot] = useState(0);
 
   const [detailRatio, setDetailRatio] = useState(DEFAULT_DETAIL_RATIO);
-  const [detailHeight, setDetailHeight] = useState(320);
+  const [detailHeight, setDetailHeight] = useState(400);
   const [isLarge, setIsLarge] = useState(false);
   const [dragging, setDragging] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -361,7 +365,7 @@ export function ExplorePcBox({ cards, boxTitle }: ExplorePcBoxProps) {
           style={{ flex: 1 }}
         >
           <div
-            className="grid flex-1 content-start grid-cols-2 gap-2 @min-[250px]:grid-cols-3 @min-[360px]:grid-cols-4 @min-[480px]:grid-cols-5 @min-[600px]:grid-cols-6 @min-[720px]:gap-3"
+            className="grid flex-1 content-start grid-cols-3 gap-2 @min-[340px]:grid-cols-4 @min-[480px]:grid-cols-5 @min-[600px]:grid-cols-6 @min-[720px]:gap-3"
             role="listbox"
             aria-label={`Cards in ${boxTitle}, ordered by set number`}
           >

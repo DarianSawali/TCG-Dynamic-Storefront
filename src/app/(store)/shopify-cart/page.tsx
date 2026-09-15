@@ -60,7 +60,7 @@ export default async function ShopifyCartPage() {
         {cart.lines.map((line) => (
           <li
             key={line.id}
-            className="grid gap-3 px-4 py-4 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center sm:gap-6"
+            className="grid min-w-0 gap-3 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto] sm:items-center sm:gap-6"
           >
             <div>
               <p className="font-medium text-pokedex-cream">
@@ -84,7 +84,7 @@ export default async function ShopifyCartPage() {
         ))}
       </ul>
 
-      <section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-pokedex/45 bg-pokedex-deep/35 px-4 py-4">
+      <section className="flex flex-col gap-4 rounded-xl border border-pokedex/45 bg-pokedex-deep/35 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-pokedex-muted">
             {cart.totalQuantity} item{cart.totalQuantity === 1 ? "" : "s"}
@@ -95,7 +95,7 @@ export default async function ShopifyCartPage() {
         </div>
         <a
           href={cart.checkoutUrl}
-          className="inline-flex rounded-lg border border-pokedex bg-pokedex px-4 py-2.5 text-sm font-medium text-white hover:border-pokedex-bright hover:bg-pokedex-bright"
+          className="inline-flex w-full items-center justify-center rounded-lg border border-pokedex bg-pokedex px-4 py-2.5 text-center text-sm font-medium text-white hover:border-pokedex-bright hover:bg-pokedex-bright sm:w-auto"
         >
           Continue to Shopify checkout
         </a>

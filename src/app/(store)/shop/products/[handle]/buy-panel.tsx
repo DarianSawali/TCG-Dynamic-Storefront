@@ -43,7 +43,7 @@ export function ShopifyBuyPanel({ variants }: { variants: ShopifyProductVariant[
         </select>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs text-zinc-500">Shopify price</p>
           <p className="text-2xl font-semibold text-pokedex-cream">
@@ -51,12 +51,12 @@ export function ShopifyBuyPanel({ variants }: { variants: ShopifyProductVariant[
           </p>
           {selected?.sku ? <p className="font-mono text-xs text-zinc-500">{selected.sku}</p> : null}
         </div>
-        <form action={action}>
+        <form action={action} className="w-full sm:w-auto">
           <input type="hidden" name="merchandiseId" value={variantId} />
           <button
             type="submit"
             disabled={pending || !selected?.availableForSale}
-            className="rounded-lg bg-pokedex px-4 py-2.5 text-sm font-medium text-white hover:bg-pokedex-bright disabled:cursor-not-allowed disabled:bg-zinc-300"
+            className="w-full rounded-lg bg-pokedex px-4 py-2.5 text-sm font-medium text-white hover:bg-pokedex-bright disabled:cursor-not-allowed disabled:bg-zinc-300 sm:w-auto"
           >
             {pending ? "Adding…" : selected?.availableForSale ? "Add to Shopify cart" : "Out of stock"}
           </button>

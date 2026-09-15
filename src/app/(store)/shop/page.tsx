@@ -42,7 +42,7 @@ export default async function ShopPage() {
           No products are currently published to the Headless channel.
         </p>
       ) : (
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
           {products.map((product, index) => {
             const available = product.variants.filter((variant) => variant.availableForSale);
             const displayVariant = available[0] ?? product.variants[0];

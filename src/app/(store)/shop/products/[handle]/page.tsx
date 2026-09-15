@@ -19,7 +19,7 @@ export default async function ShopifyProductPage({ params }: Props) {
         ← Back to shop
       </Link>
       <div className="grid gap-8 md:grid-cols-[minmax(0,360px)_1fr]">
-        <div className="relative aspect-63/88 overflow-hidden rounded-2xl bg-linear-to-br from-orange-600 to-red-950">
+        <div className="relative mx-auto aspect-63/88 w-full max-w-sm overflow-hidden rounded-2xl bg-linear-to-br from-orange-600 to-red-950 md:mx-0">
           {artwork ? (
             <Image
               src={artwork.url}

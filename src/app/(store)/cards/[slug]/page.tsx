@@ -28,19 +28,19 @@ export default async function CardDetailPage({ params }: Props) {
 
   return (
     <div className="space-y-8">
-      <nav className="text-sm text-zinc-600 dark:text-zinc-400">
+      <nav className="flex min-w-0 items-center text-sm text-zinc-600 dark:text-zinc-400">
         <Link href="/cards" className="hover:text-pokedex-bright">
           Explore
         </Link>
         <span className="mx-2 text-zinc-400">/</span>
-        <span className="text-pokedex-cream">
+        <span className="truncate text-pokedex-cream">
           {card?.name ?? slug}
         </span>
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,280px)_1fr]">
         {card?.imageUrl ? (
-          <div className="relative aspect-63/88 w-full max-w-xs overflow-hidden rounded-xl bg-zinc-100 ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800">
+          <div className="relative mx-auto aspect-63/88 w-full max-w-xs overflow-hidden rounded-xl bg-zinc-100 ring-1 ring-zinc-200/80 lg:mx-0 dark:bg-zinc-900 dark:ring-zinc-800">
             <Image
               src={card.imageUrl}
               alt={card.name}
@@ -54,8 +54,8 @@ export default async function CardDetailPage({ params }: Props) {
           <div
             className={
               card
-                ? `aspect-63/88 w-full max-w-xs rounded-xl bg-linear-to-br p-4 shadow-inner ${card.gradient}`
-                : "aspect-63/88 w-full max-w-xs rounded-xl border border-[#625253] bg-[#29282a]"
+                ? `mx-auto aspect-63/88 w-full max-w-xs rounded-xl bg-linear-to-br p-4 shadow-inner lg:mx-0 ${card.gradient}`
+                : "mx-auto aspect-63/88 w-full max-w-xs rounded-xl border border-[#625253] bg-[#29282a] lg:mx-0"
             }
           />
         )}
