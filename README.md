@@ -1,40 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PokeCell TCG
 
-## Getting Started
+A responsive headless Pokémon TCG storefront that combines a custom Next.js
+shopping experience with Shopify checkout, live card data, and a protected
+listing and pricing dashboard.
 
-### Database (PostgreSQL)
+## What it does
 
-See **[docs/postgres-setup.md](docs/postgres-setup.md)** for step-by-step setup after a fresh install or machine reset.
+- Presents the catalog as a responsive, Pokémon PC-box-inspired card browser.
+- Loads card artwork from TCGdex and synchronized market prices from JustTCG.
+- Uses Shopify's Storefront API for products, condition variants, inventory,
+  persistent carts, and hosted checkout.
+- Protects cart identifiers in encrypted, HTTP-only cookies.
+- Provides authenticated admin sessions backed by PostgreSQL.
+- Compares Shopify variants with market prices using approval thresholds and
+  timed safeguards for significant price decreases.
+- Audits catalog-to-Shopify health, including missing products, duplicate
+  matches, publication status, SKUs, variants, and inventory.
+- Generates and creates duplicate-safe, unpublished Shopify product drafts with
+  five standardized condition variants.
 
-### Dev server
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js 16, React 19, TypeScript, and Tailwind CSS
+- PostgreSQL with Prisma ORM
+- Shopify Storefront and GraphQL Admin APIs
+- TCGdex card data and artwork
+- JustTCG market pricing
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. Copy `.env.example` to `.env` and add your PostgreSQL, Shopify, and optional
+   JustTCG credentials. Never expose Admin API credentials or private Storefront
+   tokens through `NEXT_PUBLIC_` variables.
 
-To learn more about Next.js, take a look at the following resources:
+3. Apply database migrations and seed the catalog:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   npm run db:setup
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Create the first administrator:
 
-## Deploy on Vercel
+   ```bash
+   npm run admin:create
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Start the development server:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000). Detailed Windows/PostgreSQL
+instructions are available in [docs/postgres-setup.md](docs/postgres-setup.md).
+
+## Useful commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run build` | Create and validate a production build |
+| `npm run lint` | Run ESLint |
+| `npm run db:fetch-sets` | Import configured TCGdex sets |
+| `npm run pricing:sync-catalog` | Synchronize stored JustTCG prices |
+| `npm run shopify:check` | Verify Storefront API access |
+| `npm run shopify:check-admin` | Verify Shopify Admin API access |
+| `npm run shopify:check-listing-schema` | Validate listing-manager API compatibility |
+
+## Safety model
+
+Customer checkout remains hosted by Shopify. Administrative writes require an
+authenticated server-side session, re-fetch current data before mutation, and
+reject duplicate product matches or handle collisions. New products are created
+as unpublished drafts with zero inventory and must be reviewed before they can
+become sellable.
+
+## Status
+
+Active development. Catalog browsing, market-price synchronization, Shopify
+cart/checkout, guarded repricing, listing health checks, and unpublished product
+draft creation are implemented. Inventory editing and controlled Headless
+publication are the next milestone.
