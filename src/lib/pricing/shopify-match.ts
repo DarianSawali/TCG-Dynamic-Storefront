@@ -1,6 +1,13 @@
 import type { CatalogCardWithPricing } from "@/lib/catalog";
 import type { CardCondition } from "@/lib/conditions";
-import type { ShopifyProduct } from "@/lib/shopify/products";
+import type {
+  ShopifyProduct,
+  ShopifyProductVariant,
+} from "@/lib/shopify/products";
+
+type MatchableShopifyProduct = Pick<ShopifyProduct, "title"> & {
+  variants: Array<Pick<ShopifyProductVariant, "sku">>;
+};
 
 function normalize(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -17,7 +24,7 @@ export function conditionFromShopifyVariantTitle(
 }
 
 export function findCatalogCardForShopifyProduct(
-  product: ShopifyProduct,
+  product: MatchableShopifyProduct,
   cards: CatalogCardWithPricing[],
 ): CatalogCardWithPricing | undefined {
   const sku = product.variants.find((variant) => variant.sku)?.sku;

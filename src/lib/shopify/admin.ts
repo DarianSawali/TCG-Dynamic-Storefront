@@ -112,6 +112,100 @@ export type ShopifyAdminStatus = {
   canWriteProducts: boolean;
 };
 
+export type ShopifyAdminProductStatus =
+  | "ACTIVE"
+  | "ARCHIVED"
+  | "DRAFT"
+  | "UNLISTED";
+
+export type ShopifyAdminProduct = {
+  id: string;
+  title: string;
+  handle: string;
+  status: ShopifyAdminProductStatus;
+  totalInventory: number;
+  featuredImage: {
+    url: string;
+    altText: string | null;
+    width: number | null;
+    height: number | null;
+  } | null;
+  variants: Array<{
+    id: string;
+    title: string;
+    sku: string | null;
+    inventoryQuantity: number | null;
+    price: string;
+  }>;
+};
+
+type AdminProductsPage = {
+  products: {
+    nodes: Array<{
+      id: string;
+      title: string;
+      handle: string;
+      status: ShopifyAdminProductStatus;
+      totalInventory: number;
+      featuredMedia: {
+        preview: {
+          image: ShopifyAdminProduct["featuredImage"];
+        } | null;
+      } | null;
+      variants: { nodes: ShopifyAdminProduct["variants"] };
+    }>;
+    pageInfo: { hasNextPage: boolean; endCursor: string | null };
+  };
+};
+
+/** Read-only inventory used by the protected listing manager. */
+export async function getShopifyAdminProducts(): Promise<ShopifyAdminProduct[]> {
+  const products: ShopifyAdminProduct[] = [];
+  let after: string | null = null;
+
+  do {
+    const data: AdminProductsPage = await adminQuery<AdminProductsPage>(/* GraphQL */ `
+      query AdminProducts($after: String) {
+        products(first: 100, after: $after, sortKey: TITLE) {
+          nodes {
+            id
+            title
+            handle
+            status
+            totalInventory
+            featuredMedia {
+              preview {
+                image { url altText width height }
+              }
+            }
+            variants(first: 100) {
+              nodes { id title sku inventoryQuantity price }
+            }
+          }
+          pageInfo { hasNextPage endCursor }
+        }
+      }
+    `, { after });
+
+    products.push(
+      ...data.products.nodes.map((product) => ({
+        id: product.id,
+        title: product.title,
+        handle: product.handle,
+        status: product.status,
+        totalInventory: product.totalInventory,
+        featuredImage: product.featuredMedia?.preview?.image ?? null,
+        variants: product.variants.nodes,
+      })),
+    );
+    after = data.products.pageInfo.hasNextPage
+      ? data.products.pageInfo.endCursor
+      : null;
+  } while (after);
+
+  return products;
+}
+
 export async function getShopifyAdminStatus(): Promise<ShopifyAdminStatus> {
   const data = await adminQuery<{
     shop: { name: string; myshopifyDomain: string; currencyCode: string };
